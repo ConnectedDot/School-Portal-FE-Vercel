@@ -1,0 +1,306 @@
+import { useNavigate, useParams } from 'react-router-dom';
+import { AdnPaths } from '../../../router/paths';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Save } from 'lucide-react';
+import { useGetTeacher, useUpdateTeacher } from '@/hooks/teachers';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useState, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
+import type { TeacherData } from '@/types/teachers';
+
+
+
+const FacultyEdit = () => {
+    const navigate = useNavigate();
+    const { id } = useParams<{ id: any }>();
+    
+    const { data: teacher, isLoading: loadingTeacher } = useGetTeacher(id!);
+    const { mutate: updateTeacher, isPending } = useUpdateTeacher(id!);
+
+    const [formData, setFormData] = useState<TeacherData>({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        phone: '',
+        dateOfBirth: '',
+        gender: 'MALE',
+        employmentType: "FULL_TIME",
+        // address: '',
+        // department: '',
+        // specialization: '',
+        qualification: '',
+        // experience: '',
+        // joiningDate: '',
+    });
+
+    // Populate form when teacher data loads
+    useEffect(() => {
+        if (teacher) {
+            setFormData({
+                firstName: teacher.firstName || '',
+                lastName: teacher.lastName || '',
+                email: teacher.email || '',
+                password: '', // or teacher.password if available
+                phone: teacher.phone || '',
+                dateOfBirth: teacher.dateOfBirth ? teacher.dateOfBirth.split('T')[0] : '',
+                gender: teacher.gender as 'MALE' | 'FEMALE' | 'OTHER' || 'MALE',
+                employmentType: teacher.employmentType || 'FULL_TIME',
+                // address: teacher.address || '',
+                // department: teacher.department || '',
+                // specialization: teacher.specialization || '',
+                qualification: teacher.qualification || '',
+                // experience: teacher.experience || '',
+                // joiningDate: teacher.joiningDate ? teacher.joiningDate.split('T')[0] : '',
+            });
+        }
+    }, [teacher]);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        updateTeacher(formData, {
+            onSuccess: () => {
+                navigate(`${AdnPaths.FACULTY}/${id}`);
+            },
+        });
+    };
+
+    const handleCancel = () => {
+        navigate(`${AdnPaths.FACULTY}/${id}`);
+    };
+
+    const handleChange = (field: keyof TeacherData, value: string) => {
+        setFormData((prev) => ({ ...prev, [field]: value }));
+    };
+
+    if (loadingTeacher) {
+        return (
+            <div className="flex items-center justify-center h-96">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    if (!teacher) {
+        return (
+            <div className="flex flex-col items-center justify-center h-96 space-y-4">
+                <p className="text-muted-foreground">Failed to load faculty member details</p>
+                <Button variant="outline" onClick={() => navigate(AdnPaths.FACULTY)}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Faculty List
+                </Button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-4">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(-1)}
+                        // onClick={() => navigate(`${AdnPaths.FACULTY}/${id}`)}
+                        className="flex items-center gap-2"
+                    >
+                        <ArrowLeft className="h-4 w-4" />
+                        Back
+                    </Button>
+                    <div>
+                        <h1 className="text-2xl font-bold text-foreground">Edit Faculty Member</h1>
+                        <p className="text-muted-foreground text-sm">
+                            Update details for {teacher.firstName} {teacher.lastName}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit}>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Faculty Information</CardTitle>
+                        <CardDescription>
+                            Update the details below to modify faculty member information
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        {/* Personal Information */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold">Personal Information</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="firstName">First Name *</Label>
+                                    <Input
+                                        id="firstName"
+                                        value={formData.firstName}
+                                        onChange={(e) => handleChange('firstName', e.target.value)}
+                                        placeholder="Enter first name"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="lastName">Last Name *</Label>
+                                    <Input
+                                        id="lastName"
+                                        value={formData.lastName}
+                                        onChange={(e) => handleChange('lastName', e.target.value)}
+                                        placeholder="Enter last name"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="email">Email Address *</Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        value={formData.email}
+                                        onChange={(e) => handleChange('email', e.target.value)}
+                                        placeholder="teacher@school.com"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="phoneNumber">Phone Number *</Label>
+                                    <Input
+                                        id="phoneNumber"
+                                        value={formData.phone}
+                                        onChange={(e) => handleChange('phone', e.target.value)}
+                                        placeholder="+234 XXX XXX XXXX"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="dateOfBirth">Date of Birth *</Label>
+                                    <Input
+                                        id="dateOfBirth"
+                                        type="date"
+                                        value={formData.dateOfBirth}
+                                        onChange={(e) => handleChange('dateOfBirth', e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="gender">Gender *</Label>
+                                    <Select
+                                        value={formData.gender}
+                                        onValueChange={(value) => handleChange('gender', value)}
+                                    >
+                                        <SelectTrigger id="gender">
+                                            <SelectValue placeholder="Select gender" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Male">Male</SelectItem>
+                                            <SelectItem value="Female">Female</SelectItem>
+                                            <SelectItem value="Other">Other</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                {/* <div className="space-y-2">
+                                    <Label htmlFor="joiningDate">Joining Date *</Label>
+                                    <Input
+                                        id="joiningDate"
+                                        type="date"
+                                        value={formData.joiningDate}
+                                        onChange={(e) => handleChange('joiningDate', e.target.value)}
+                                        required
+                                    />
+                                </div> */}
+                            </div>
+                            {/* <div className="space-y-2">
+                                <Label htmlFor="address">Address *</Label>
+                                <Textarea
+                                    id="address"
+                                    value={formData.address}
+                                    onChange={(e) => handleChange('address', e.target.value)}
+                                    placeholder="Enter full address"
+                                    required
+                                />
+                            </div> */}
+                        </div>
+
+                        {/* Professional Information */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold">Professional Information</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* <div className="space-y-2">
+                                    <Label htmlFor="department">Department *</Label>
+                                    <Input
+                                        id="department"
+                                        value={formData.department}
+                                        onChange={(e) => handleChange('department', e.target.value)}
+                                        placeholder="e.g., Mathematics, Science"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="specialization">Specialization *</Label>
+                                    <Input
+                                        id="specialization"
+                                        value={formData.specialization}
+                                        onChange={(e) => handleChange('specialization', e.target.value)}
+                                        placeholder="e.g., Algebra, Physics"
+                                        required
+                                    />
+                                </div> */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="qualification">Highest Qualification *</Label>
+                                    <Input
+                                        id="qualification"
+                                        value={formData.qualification}
+                                        onChange={(e) => handleChange('qualification', e.target.value)}
+                                        placeholder="e.g., M.Sc., Ph.D."
+                                        required
+                                    />
+                                </div>
+                                {/* <div className="space-y-2">
+                                    <Label htmlFor="experience">Years of Experience *</Label>
+                                    <Input
+                                        id="experience"
+                                        value={formData.experience}
+                                        onChange={(e) => handleChange('experience', e.target.value)}
+                                        placeholder="e.g., 5 years"
+                                        required
+                                    />
+                                </div> */}
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center justify-end gap-3 pt-4">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleCancel}
+                                disabled={isPending}
+                            >
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={isPending}>
+                                {isPending ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Save className="mr-2 h-4 w-4" />
+                                        Save Changes
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            </form>
+        </div>
+    );
+};
+
+export default FacultyEdit;
