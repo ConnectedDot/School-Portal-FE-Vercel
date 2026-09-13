@@ -4,7 +4,8 @@ import { SdtPaths } from './paths';
 
 const StudentDashboard = lazy(() => import('../pages/student/StudentDashboard'));
 const StudentEnrollment = lazy(() => import('../pages/student/StudentEnrollment'));
-const MyEnrollments = lazy(() => import('../pages/student/MyEnrollments'));
+// Legacy enrollment view retained for possible future use; My Courses now owns this data.
+// const MyEnrollments = lazy(() => import('../pages/student/MyEnrollments'));
 const StudentCourses = lazy(() => import('../pages/student/StudentCourses'));
 const StudentAssignments = lazy(() => import('../pages/student/StudentAssignments'));
 const StudentGrades = lazy(() => import('../pages/student/StudentGrades'));
@@ -29,7 +30,7 @@ export const StudentRouter = () => {
             <Route path="calendar" element={<StudentCalendar />} />
             <Route path="profile" element={<StudentProfile />} />
             <Route path="enroll" element={<StudentEnrollment />} />
-            <Route path="enrollments" element={<MyEnrollments />} />
+            {/* <Route path="enrollments" element={<MyEnrollments />} /> */}
             <Route path="*" element={<NotFound />} />
         </Routes>
     );

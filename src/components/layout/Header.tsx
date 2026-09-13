@@ -66,7 +66,7 @@ export const Header = () => {
 
 	return (
 		<TooltipProvider>
-			<header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 px-4 py-3 backdrop-blur-xl dark:border-white/10 dark:bg-[#050505]/75 sm:px-6 lg:px-8">
+			<header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 px-4 py-3 backdrop-blur-xl dark:border-border/80 dark:bg-background/85 sm:px-6 lg:px-8">
 				<div className="mx-auto flex w-full max-w-[1600px] items-center gap-4">
 					<SidebarTrigger className="h-10 w-10 rounded-2xl border border-slate-200 bg-white text-slate-800 shadow-sm hover:bg-brand-50 hover:text-brand-700 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10">
 						<Menu className="h-5 w-5" />

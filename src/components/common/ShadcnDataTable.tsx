@@ -277,7 +277,7 @@ export function ShadcnDataTable<T>({
     const isIndeterminate = paginatedData.some(item => selectedItems.includes(keyExtractor(item))) && !isAllSelected;
 
     return (
-        <Card className={`overflow-hidden rounded-3xl border-slate-200/80 bg-white/90 shadow-premium dark:border-white/10 dark:bg-white/[0.04] ${className || ''}`}>
+        <Card className={`overflow-hidden rounded-3xl border-slate-200/80 bg-white/90 shadow-premium dark:border-border dark:bg-card ${className || ''}`}>
             <CardHeader className="gap-5">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="space-y-2">
@@ -318,7 +318,7 @@ export function ShadcnDataTable<T>({
                                 placeholder={searchPlaceholder}
                                 value={searchQuery}
                                 onChange={(e) => handleSearch(e.target.value)}
-                                className="h-11 rounded-full border-slate-200 bg-slate-50/80 pl-10 dark:border-white/10 dark:bg-white/[0.04]"
+                                className="h-11 rounded-full border-slate-200 bg-slate-50/80 pl-10 dark:border-border dark:bg-muted/70"
                             />
                         </div>
                     )}
@@ -371,11 +371,11 @@ export function ShadcnDataTable<T>({
             </CardHeader>
 
             <CardContent>
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-white/10 dark:bg-white/[0.02]">
+                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-border dark:bg-background/35">
                     <div className="custom-scrollbar w-full overflow-x-auto">
                     <Table>
                         <TableHeader>
-                            <TableRow className="bg-slate-50/80 hover:bg-slate-50/80 dark:bg-white/[0.03] dark:hover:bg-white/[0.03]">
+                            <TableRow className="bg-slate-50/80 hover:bg-slate-50/80 dark:bg-muted/65 dark:hover:bg-muted/65">
                                 {selectable && (
                                     <TableHead className="w-12">
                                         <Checkbox
@@ -435,7 +435,7 @@ export function ShadcnDataTable<T>({
                                     const isSelected = selectedItems.includes(itemId);
 
                                     return (
-                                        <TableRow key={itemId} className={`${isSelected ? 'bg-muted/50' : ''} transition-colors hover:bg-brand-50/40 dark:hover:bg-white/[0.04]`}>
+                                        <TableRow key={itemId} className={`${isSelected ? 'bg-muted/70' : ''} transition-colors hover:bg-brand-50/40 dark:hover:bg-muted/55`}>
                                             {selectable && (
                                                 <TableCell>
                                                     <Checkbox

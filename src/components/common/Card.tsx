@@ -27,10 +27,10 @@ export const Card = ({
     const hoverClass = hoverable ? 'hover:shadow-xl transition-shadow duration-300' : '';
 
     return (
-        <div className={`bg-white rounded-lg shadow-md ${hoverClass} ${className}`}>
+        <div className={`rounded-lg bg-white text-slate-950 shadow-md dark:bg-slate-900 dark:text-white ${hoverClass} ${className}`}>
             {(title || subtitle) && (
                 <div className={`border-b border-gray-100 ${paddingClasses[padding]}`}>
-                    {title && <h3 className="text-lg font-semibold text-gray-800">{title}</h3>}
+                    {title && <h3 className="text-lg font-semibold text-inherit">{title}</h3>}
                     {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
                 </div>
             )}

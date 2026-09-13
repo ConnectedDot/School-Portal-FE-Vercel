@@ -1,7 +1,6 @@
 import { useContext, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,6 +24,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
+	const [errors, setErrors] = useState<{ identifier?: string; password?: string; form?: string }>({});
 	const { authenticate, updateUser } = useContext(AuthContext);
 	const navigate = useNavigate();
 
@@ -70,20 +70,24 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 		const submittedEmail = String(formData.get("email") || email).trim();
 		const submittedPassword = String(formData.get("password") || password);
 
-		if (!submittedEmail || !submittedPassword) {
-			toast.error("Enter your email and password to continue.");
+		const nextErrors = {
+			identifier: submittedEmail ? undefined : "Enter your email address or school ID.",
+			password: submittedPassword ? undefined : "Enter your password.",
+		};
+		if (nextErrors.identifier || nextErrors.password) {
+			setErrors(nextErrors);
 			return;
 		}
 
 		try {
+			setErrors({});
 			reset();
-			await submitLogin({ email: submittedEmail, password: submittedPassword });
+			await submitLogin({
+				...(submittedEmail.includes("@") ? { email: submittedEmail } : { schoolId: submittedEmail }),
+				password: submittedPassword,
+			});
 		} catch (err) {
-			toast.error(
-				err instanceof Error
-					? `Login failed: ${err.message}`
-					: "Login failed: An error occurred while logging in"
-			);
+			setErrors({ form: err instanceof Error ? err.message : "Unable to sign in. Please try again." });
 		}
 	};
 
@@ -117,25 +121,28 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 
 							<Field>
 								<FieldLabel htmlFor="email" className="text-slate-200">
-									Email address
+									Email address or school ID
 								</FieldLabel>
 								<div className="relative">
 									<Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
 									<Input
 										id="email"
 										name="email"
-										type="email"
-										placeholder="name@school.com"
+										type="text"
+										placeholder="name@school.com or FORT-STU-1"
 										value={email}
-										onChange={(e) => setEmail(e.target.value)}
+										onChange={(e) => { setEmail(e.target.value); setErrors((current) => ({ ...current, identifier: undefined, form: undefined })); }}
 										autoComplete="email"
-										className="h-12 rounded-2xl border-white/10 bg-white/10 pl-11 text-white placeholder:text-slate-500 focus-visible:ring-brand-500"
+										aria-invalid={!!errors.identifier}
+										aria-describedby={errors.identifier ? "login-identifier-error" : undefined}
+										className="h-12 rounded-2xl border-white/10 bg-white/10 pl-11 text-white placeholder:text-slate-500 focus-visible:ring-brand-500 aria-[invalid=true]:border-red-400"
 										required
 									/>
 								</div>
 								<FieldDescription className="text-slate-400">
-									Use the email assigned to your Fortis portal account.
+									Use the email or school ID assigned to your portal account.
 								</FieldDescription>
+								{errors.identifier && <p id="login-identifier-error" role="alert" className="text-sm font-medium text-red-300">{errors.identifier}</p>}
 							</Field>
 
 							<Field>
@@ -149,9 +156,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 										name="password"
 										type={showPassword ? "text" : "password"}
 										value={password}
-										onChange={(e) => setPassword(e.target.value)}
+										onChange={(e) => { setPassword(e.target.value); setErrors((current) => ({ ...current, password: undefined, form: undefined })); }}
 										autoComplete="current-password"
-										className="h-12 rounded-2xl border-white/10 bg-white/10 pl-11 pr-12 text-white placeholder:text-slate-500 focus-visible:ring-brand-500"
+										aria-invalid={!!errors.password}
+										aria-describedby={errors.password ? "login-password-error" : undefined}
+										className="h-12 rounded-2xl border-white/10 bg-white/10 pl-11 pr-12 text-white placeholder:text-slate-500 focus-visible:ring-brand-500 aria-[invalid=true]:border-red-400"
 										required
 									/>
 									<button
@@ -166,6 +175,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 								<FieldDescription className="text-slate-400">
 									Keep your password private and avoid shared devices.
 								</FieldDescription>
+								{errors.password && <p id="login-password-error" role="alert" className="text-sm font-medium text-red-300">{errors.password}</p>}
 							</Field>
 
 							<div className="flex items-center justify-between text-sm">
@@ -179,6 +189,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 							</div>
 
 							<Field>
+								{errors.form && <div role="alert" className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{errors.form}</div>}
 								<Button
 									type="submit"
 									disabled={loading}

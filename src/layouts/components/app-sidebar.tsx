@@ -14,7 +14,6 @@ import {
 	FileText,
 	GraduationCap,
 	LayoutDashboard,
-	Library,
 	MessageSquare,
 	Settings2,
 	ShieldCheck,
@@ -59,7 +58,7 @@ const getNavigationByRole = (role?: string) => {
 					icon: BookOpenCheck,
 					items: [
 						{ title: "Courses", url: AdnPaths.COURSES },
-						{ title: "Library", url: AdnPaths.LIBRARY },
+						// Library navigation paused; implementation is retained for future use.
 						{ title: "Grades", url: AdnPaths.GRADES },
 					],
 				},
@@ -89,7 +88,7 @@ const getNavigationByRole = (role?: string) => {
 			return [
 				{ title: "Dashboard", url: SdtPaths.DASH, icon: LayoutDashboard },
 				{ title: "Enroll in Courses", url: SdtPaths.ENROLL, icon: BookOpen },
-				{ title: "My Enrollments", url: SdtPaths.ENROLLMENTS, icon: BookOpenCheck },
+				// My Enrollments is consolidated into My Courses.
 				{ title: "My Courses", url: SdtPaths.COURSES, icon: BookOpenCheck },
 				{ title: "Assignments", url: SdtPaths.ASSIGNMENTS, icon: FileText },
 				{ title: "Grades", url: SdtPaths.GRADES, icon: ClipboardCheck },

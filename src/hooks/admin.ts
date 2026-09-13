@@ -1,4 +1,5 @@
-import { useGetItem, useGetPaginatedItem } from "./general";
+import { useGetItem } from "./general";
+import { useAdminUsersQuery } from './adminUsers';
 
 // Types for User (can be Student, Teacher, Admin, etc.)
 export interface User {
@@ -33,20 +34,20 @@ export const useGetAllUsers = (
     limit: number = 10,
     filters?: GetAllUsersParams
 ) => {
-    // Build query parameters from filters
-    const params: Record<string, string> = {};
-    if (filters?.role) params.role = filters.role;
-    if (filters?.studentLevel) params.studentLevel = filters.studentLevel;
-    if (filters?.status) params.status = filters.status;
-    if (filters?.search) params.search = filters.search;
-
-    return useGetPaginatedItem<User>({
-        relativeUrl: '/admin/all-users',
-        limit,
-        autoFetchAll: false,
-        enabled: true,
-        queryParams: params,
+    void page; void limit;
+    const query = useAdminUsersQuery();
+    const needle = filters?.search?.trim().toLowerCase();
+    const data = query.data?.filter((user) => {
+        if (filters?.role && user.role !== filters.role) return false;
+        if (filters?.studentLevel && user.studentLevel !== filters.studentLevel) return false;
+        if (filters?.status && user.status !== filters.status) return false;
+        if (needle) {
+            const haystack = `${user.firstName || ''} ${user.lastName || ''} ${user.email || ''}`.toLowerCase();
+            if (!haystack.includes(needle)) return false;
+        }
+        return true;
     });
+    return { ...query, data: data as User[] | undefined };
 };
 
 // Get all users (convenience wrapper for all users)

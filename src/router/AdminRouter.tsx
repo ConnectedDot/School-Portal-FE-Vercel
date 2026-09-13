@@ -18,7 +18,8 @@ const CourseForm = lazy(() => import('../pages/admin/courses/CourseForm'));
 const CourseView = lazy(() => import('../pages/admin/courses/CourseView'));
 const AdminUsersList = lazy(() => import('../pages/admin/users/AdminUsersList'));
 const AdminNotifications = lazy(() => import('../pages/admin/Notifications'));
-const Library = lazy(() => import('../pages/admin/Library'));
+// Library is retained for a future release.
+// const Library = lazy(() => import('../pages/admin/Library'));
 const Attendance = lazy(() => import('../pages/admin/Attendance'));
 const Grades = lazy(() => import('../pages/admin/Grades'));
 const Communication = lazy(() => import('../pages/admin/Communication'));
@@ -57,7 +58,8 @@ export const AdminRouter = () => {
 
             {/* Notifications */}
             <Route path="notifications" element={<AdminNotifications />} />
-            <Route path="library" element={<Library />} />
+            {/* Library module paused until its product scope is restored. */}
+            {/* <Route path="library" element={<Library />} /> */}
             <Route path="attendance" element={<Attendance />} />
             <Route path="grades" element={<Grades />} />
             <Route path="communication" element={<Communication />} />

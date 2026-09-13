@@ -1,5 +1,7 @@
-import { useCreateItem, useGetItems, useGetItem, useUpdateItem, useDeleteItem, useGetPaginatedItem } from "./general";
+import { useCreateItem, useGetItems, useGetItem, useUpdateItem, useDeleteItem } from "./general";
 import { axiosInstance } from "@/axios-Instance";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAdminUsersQuery } from './adminUsers';
 
 // Types for Student (matching Postman collection + backward compatibility)
 export interface Student {
@@ -33,8 +35,8 @@ export interface Student {
 }
 
 export interface CreateStudentDto {
-    email: string;
-    password: string;
+    email?: string;
+    password?: string;
     firstName: string;
     lastName: string;
     gender?: string;
@@ -55,12 +57,9 @@ export interface UpdateStudentDto {
 
 // Get all students with pagination (admin endpoint - backward compatibility)
 export const useGetStudents = (page: number = 1, limit: number = 20, autoFetchAll: boolean = false) => {
-    return useGetPaginatedItem<Student>({
-        relativeUrl: '/admin/all-users',
-        limit,
-        autoFetchAll,
-        enabled: true,
-    });
+    void page; void limit; void autoFetchAll;
+    const query = useAdminUsersQuery();
+    return { ...query, data: query.data?.filter((user) => user.role === 'STUDENT') as Student[] | undefined };
 };
 
 // Get my student profile
@@ -89,12 +88,29 @@ export const useUpdateMyStudentProfile = (
     );
 };
 
+export const useChangeStudentPassword = () => useMutation({
+    mutationFn: async (body: { oldPassword: string; newPassword: string; confirmPassword: string }) =>
+        (await axiosInstance.patch('/student/change-password', body)).data,
+});
+
+export const useUploadStudentAvatar = () => {
+    const client = useQueryClient();
+    return useMutation({
+        mutationFn: async (file: File) => {
+            const form = new FormData();
+            form.append('file', file);
+            return (await axiosInstance.post('/student/upload-avatar', form)).data;
+        },
+        onSuccess: () => client.invalidateQueries({ queryKey: ['/student/profile'] }),
+    });
+};
+
 // Create new student (admin only)
 export const useCreateStudent = (
     onSuccessFn?: (data: any) => Promise<any>
 ) => {
     return useCreateItem<Student>(
-        '/auth/register-student',
+        '/auth/register',
         'Student created successfully',
         onSuccessFn,
         false, // Not form data

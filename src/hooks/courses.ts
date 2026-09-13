@@ -49,6 +49,8 @@ export const useGetCourses = (page: number = 1, limit: number = 10, autoFetchAll
     return useGetPaginatedItem<Course>({
         relativeUrl: '/course/all',
         limit,
+        page,
+        search,
         autoFetchAll,
         enabled: true,
     });
@@ -99,7 +101,7 @@ export const useUpdateCourse = (
     onSuccessFn?: (data: any) => Promise<any>
 ) => {
     return useUpdateItem<Course>(
-        '/course',
+        '/course/update',
         'Course updated successfully',
         onSuccessFn,
         false, // Not form data
@@ -111,7 +113,7 @@ export const useUpdateCourse = (
 // Delete course
 export const useDeleteCourse = () => {
     return useDeleteItem<Course>(
-        '/course',
+        '/course/delete',
         'Course deleted successfully',
         true,  // Show success alert
         true   // Show error alert

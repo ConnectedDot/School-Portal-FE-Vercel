@@ -42,9 +42,7 @@ const FacultyList = () => {
     //     );
     // }
 
-    const facultyList = Array.isArray(teachers)
-        ? teachers
-        : teachers?.data || [];
+    const facultyList: TeacherData[] = teachers || [];
 
     // Define columns for ShadcnDataTable
     const columns: ShadcnDataTableColumn<TeacherData>[] = [
@@ -65,16 +63,16 @@ const FacultyList = () => {
                 <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
                         <AvatarImage
-                            src={`https://api.dicebear.com/7.x/initials/svg?seed=${teacher.firstName} ${teacher.lastName}`}
-                            alt={`${teacher.firstName} ${teacher.lastName}`}
+                            src={teacher.avatar || undefined}
+                            alt={`${teacher.firstName || 'Faculty'} ${teacher.lastName || ''}`}
                         />
                         <AvatarFallback>
-                            {teacher.firstName[0]}{teacher.lastName[0]}
+                            {`${teacher.firstName?.[0] || ''}${teacher.lastName?.[0] || ''}` || 'FT'}
                         </AvatarFallback>
                     </Avatar>
                     <div>
                         <div className="font-medium">
-                            {teacher.firstName} {teacher.lastName}
+                            {teacher.firstName || 'Faculty'} {teacher.lastName || ''}
                         </div>
                         <div className="text-sm text-muted-foreground">{teacher.email}</div>
                     </div>
@@ -124,17 +122,17 @@ const FacultyList = () => {
         {
             key: 'gender',
             label: 'Gender',
-            options: [...new Set(facultyList.map(t => t.gender).filter(Boolean))].sort().map(g => ({
-                value: g!,
-                label: g!,
+            options: [...new Set(facultyList.map((t: TeacherData) => String(t.gender || '')).filter(Boolean))].sort().map(g => ({
+                value: g,
+                label: g,
             })),
         },
         {
             key: 'employmentType',
             label: 'Employment Type',
-            options: [...new Set(facultyList.map(t => t.employmentType).filter(Boolean))].sort().map(s => ({
-                value: s!,
-                label: s!,
+            options: [...new Set(facultyList.map((t: TeacherData) => String(t.employmentType || '')).filter(Boolean))].sort().map(s => ({
+                value: s,
+                label: s,
             })),
         },
         {

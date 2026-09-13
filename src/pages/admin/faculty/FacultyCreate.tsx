@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { TeacherData } from '@/types/teachers';
@@ -26,7 +25,6 @@ const FacultyCreate = () => {
         firstName: '',
         lastName: '',
         email: '',
-        password: '',
         phone: '',
         dateOfBirth: '',
         gender: 'MALE',
@@ -125,17 +123,6 @@ const FacultyCreate = () => {
                                         value={formData.email}
                                         onChange={(e) => handleChange('email', e.target.value)}
                                         placeholder="teacher@school.com"
-                                        required
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="password">Password *</Label>
-                                    <Input
-                                        id="password"
-                                        type="password"
-                                        value={formData.password}
-                                        onChange={(e) => handleChange('password', e.target.value)}
-                                        placeholder="Enter password"
                                         required
                                     />
                                 </div>

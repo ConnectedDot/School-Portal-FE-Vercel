@@ -349,6 +349,7 @@ export const useGetPaginatedItem = <T>({
     enabled = true,
     placeholder,
     queryParams,
+    sendPaginationParams = true,
 }: {
     relativeUrl: string;
     limit?: number;
@@ -359,13 +360,14 @@ export const useGetPaginatedItem = <T>({
     enabled?: boolean;
     placeholder?: any;
     queryParams?: Record<string, string>;
+    sendPaginationParams?: boolean;
 }) => {
     const buildUrl = (cursor?: string | null, pageNumber?: number) => {
         let url = relativeUrl;
         const params = new URLSearchParams();
 
-        if (limit) params.append('limit', limit.toString());
-        if (pageNumber) params.append('page', pageNumber.toString());
+        if (sendPaginationParams && limit) params.append('limit', limit.toString());
+        if (sendPaginationParams && pageNumber) params.append('page', pageNumber.toString());
         if (cursor) params.append('cursor', cursor);
         if (search) params.append('search', search);
         
@@ -417,7 +419,7 @@ export const useGetPaginatedItem = <T>({
                     }
 
                     const meta = data?.meta || data?.data?.meta;
-                    if (meta?.totalPages && currentPage < meta.totalPages) {
+                    if (sendPaginationParams && meta?.totalPages && currentPage < meta.totalPages) {
                         return fetchAllPages(allData, null, currentPage + 1);
                     }
 
@@ -452,10 +454,16 @@ export const useGetPaginatedItem = <T>({
         queryFn: async () => {
             // Build URL with query parameters
             const params = new URLSearchParams();
-            if (limit) params.append('limit', limit.toString());
-            if (page) params.append('page', page.toString());
+            if (sendPaginationParams && limit) params.append('limit', limit.toString());
+            if (sendPaginationParams && page) params.append('page', page.toString());
             if (cursor) params.append('cursor', cursor);
             if (search) params.append('search', search);
+
+            if (queryParams) {
+                Object.entries(queryParams).forEach(([key, value]) => {
+                    if (value) params.append(key, value);
+                });
+            }
 
             const queryString = params.toString();
             const url = `${relativeUrl}${queryString ? '?' + queryString : ''}`;

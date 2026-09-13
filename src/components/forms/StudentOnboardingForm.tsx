@@ -22,14 +22,13 @@ import type { Student } from '../../types';
 const personalInfoSchema = z.object({
     firstName: z.string().min(2, 'First name must be at least 2 characters'),
     lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-    email: z.string().email('Invalid email address'),
+    email: z.union([z.literal(''), z.string().email('Invalid email address')]).optional(),
     phone: z.string().optional(),
     dateOfBirth: z.string().min(1, 'Date of birth is required'),
     gender: z.enum(['male', 'female', 'other'], { message: 'Please select a gender' }),
 });
 
 const academicInfoSchema = z.object({
-    studentId: z.string().min(5, 'Student ID must be at least 5 characters'),
     grade: z.string().min(1, 'Please select a grade'),
     section: z.string().min(1, 'Please select a section'),
     academicYear: z.string().min(1, 'Please select academic year'),
@@ -90,7 +89,7 @@ const steps: OnboardingStep[] = [
         description: 'Educational background and enrollment information',
         icon: GraduationCap,
         schema: academicInfoSchema,
-        fields: ['studentId', 'grade', 'section', 'academicYear', 'previousSchool', 'transferReason'],
+        fields: ['grade', 'section', 'academicYear', 'previousSchool', 'transferReason'],
     },
     {
         id: 'guardian',
@@ -115,9 +114,10 @@ interface StudentOnboardingFormProps {
     onSubmit?: (data: StudentOnboardingData) => void;
     onCancel?: () => void;
     className?: string;
+    isSubmitting?: boolean;
 }
 
-export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className }: StudentOnboardingFormProps) {
+export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className, isSubmitting = false }: StudentOnboardingFormProps) {
     const [currentStep, setCurrentStep] = useState(0);
     const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
     const [isLoading, setIsLoading] = useState(!!studentId);
@@ -126,6 +126,8 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
 
     const form = useForm<StudentOnboardingData>({
         resolver: zodResolver(studentOnboardingSchema),
+        mode: 'onChange',
+        reValidateMode: 'onChange',
         defaultValues: {
             firstName: '',
             lastName: '',
@@ -133,7 +135,6 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
             phone: '',
             dateOfBirth: '',
             gender: undefined,
-            studentId: '',
             grade: '',
             section: '',
             academicYear: '',
@@ -154,23 +155,6 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
             bloodGroup: '',
         },
     });
-
-    // Auto-generate student ID if not in edit mode
-    useEffect(() => {
-        if (!isEditMode && !form.getValues('studentId')) {
-            const generateStudentId = () => {
-                const randomHex = Math.floor(Math.random() * 0xFFFFFF)
-                    .toString(16)
-                    .toUpperCase()
-                    .padStart(6, '0');
-                return `FORT-${randomHex}`;
-            };
-
-            const newStudentId = generateStudentId();
-            form.setValue('studentId', newStudentId);
-        }
-    }, [isEditMode, form]);
-
 
     // Fetch student data when in edit mode
     useEffect(() => {
@@ -194,7 +178,6 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
                         phone: foundStudent.phone || '',
                         dateOfBirth: foundStudent.dateOfBirth,
                         gender: (foundStudent.gender as 'male' | 'female' | 'other') || 'male', // Default to male if not specified
-                        studentId: foundStudent.studentId,
                         grade: foundStudent.grade,
                         section: foundStudent.class, // Map class to section
                         academicYear: new Date().getFullYear().toString(),
@@ -262,7 +245,7 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
             return true;
         } catch (error) {
             // Trigger validation errors in the form
-            await form.trigger(stepFields);
+            await form.trigger(stepFields, { shouldFocus: true });
             return false;
         }
     };
@@ -408,23 +391,13 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
 
                                         <FormField
                                             control={form.control}
-                                            name="studentId"
+                                            name="lastName"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Student ID</FormLabel>
+                                                    <FormLabel>Last Name</FormLabel>
                                                     <FormControl>
-                                                        <Input
-                                                            placeholder="Enter student ID"
-                                                            readOnly={isEditMode}
-                                                            className={isEditMode ? 'bg-muted' : ''}
-                                                            {...field}
-                                                        />
+                                                        <Input placeholder="Enter last name" {...field} />
                                                     </FormControl>
-                                                    {isEditMode && (
-                                                        <FormDescription>
-                                                            Student ID cannot be changed
-                                                        </FormDescription>
-                                                    )}
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
@@ -437,12 +410,12 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
                                             name="email"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Email Address</FormLabel>
+                                                    <FormLabel>Email Address (Optional)</FormLabel>
                                                     <FormControl>
                                                         <Input type="email" placeholder="student@school.com" {...field} />
                                                     </FormControl>
                                                     <FormDescription>
-                                                        Student email for communication and portal access
+                                                        Leave blank to use the backend-generated school ID for sign-in.
                                                     </FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
@@ -519,23 +492,6 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <FormField
                                             control={form.control}
-                                            name="studentId"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Student ID</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="STU-2024-001" {...field} />
-                                                    </FormControl>
-                                                    <FormDescription>
-                                                        Unique identifier for the student
-                                                    </FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
                                             name="grade"
                                             render={({ field }) => (
                                                 <FormItem>
@@ -547,10 +503,12 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            <SelectItem value="9">Grade 9</SelectItem>
-                                                            <SelectItem value="10">Grade 10</SelectItem>
-                                                            <SelectItem value="11">Grade 11</SelectItem>
-                                                            <SelectItem value="12">Grade 12</SelectItem>
+                                                            <SelectItem value="JSS_1">JSS 1</SelectItem>
+                                                            <SelectItem value="JSS_2">JSS 2</SelectItem>
+                                                            <SelectItem value="JSS_3">JSS 3</SelectItem>
+                                                            <SelectItem value="SSS_1">SSS 1</SelectItem>
+                                                            <SelectItem value="SSS_2">SSS 2</SelectItem>
+                                                            <SelectItem value="SSS_3">SSS 3</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
@@ -565,18 +523,18 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
                                             name="section"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Section</FormLabel>
+                                                    <FormLabel>Department</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger>
-                                                                <SelectValue placeholder="Select section" />
+                                                                <SelectValue placeholder="Select department" />
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            <SelectItem value="A">Section A</SelectItem>
-                                                            <SelectItem value="B">Section B</SelectItem>
-                                                            <SelectItem value="C">Section C</SelectItem>
-                                                            <SelectItem value="D">Section D</SelectItem>
+                                                            <SelectItem value="NONE">None / Junior School</SelectItem>
+                                                            <SelectItem value="SCIENCE">Science</SelectItem>
+                                                            <SelectItem value="ART">Art</SelectItem>
+                                                            <SelectItem value="COMMERCIAL">Commercial</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
@@ -901,7 +859,7 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
                             <div className="flex justify-between pt-4">
                                 <div className="flex space-x-2">
                                     {onCancel && (
-                                        <Button type="button" variant="outline" onClick={onCancel}>
+                                        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
                                             Cancel
                                         </Button>
                                     )}
@@ -910,7 +868,8 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
                                             type="button"
                                             variant="outline"
                                             onClick={handlePrevious}
-                                            className="flex items-center gap-2 text-foreground"
+                                            disabled={isSubmitting}
+                                            className="flex items-center gap-2"
                                         >
                                             <ChevronLeft className="h-4 w-4" />
                                             Previous
@@ -923,7 +882,8 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
                                         <Button
                                             type="button"
                                             onClick={handleNext}
-                                            className="flex items-center gap-2 text-foreground"
+                                            disabled={isSubmitting}
+                                            className="flex items-center gap-2 text-white"
                                         >
                                             Next
                                             <ChevronRight className="h-4 w-4" />
@@ -931,10 +891,11 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
                                     ) : (
                                         <Button
                                             type="submit"
-                                            className="flex items-center gap-2 text-foreground"
+                                            disabled={isSubmitting}
+                                            className="flex items-center gap-2 text-white"
                                         >
                                             <Check className="h-4 w-4" />
-                                            Complete Onboarding
+                                            {isSubmitting ? 'Creating student…' : 'Complete Onboarding'}
                                         </Button>
                                     )}
                                 </div>

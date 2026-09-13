@@ -10,11 +10,10 @@ import { toast } from 'sonner';
 interface StudentOnboardingData {
     firstName: string;
     lastName: string;
-    email: string;
+    email?: string;
     phone?: string;
     dateOfBirth: string;
     gender: 'male' | 'female' | 'other';
-    studentId: string;
     grade: string;
     section: string;
     academicYear: string;
@@ -50,17 +49,17 @@ const StudentOnboard = () => {
         const studentData = {
             firstName: data.firstName,
             lastName: data.lastName,
-            email: data.email,
-            password: 'defaultPassword123', // You might want to generate this or add a field
-            phoneNumber: data.phone,
-            dateOfBirth: data.dateOfBirth,
-            gender: data.gender,
-            address: data.address,
-            grade: data.grade,
-            section: data.section,
-            guardianName: `${data.guardianFirstName} ${data.guardianLastName}`,
+            ...(data.email ? { email: data.email } : {}),
+            ...(data.phone ? { phone: data.phone } : {}),
+            dateOfBirth: new Date(data.dateOfBirth).toISOString(),
+            gender: data.gender.toUpperCase(),
+            studentLevel: data.grade,
+            department: data.section,
+            guardianFirstName: data.guardianFirstName,
+            guardianLastName: data.guardianLastName,
             guardianEmail: data.guardianEmail,
             guardianPhone: data.guardianPhone,
+            guardianAddress: data.address,
         };
 
         createStudent(studentData);
@@ -100,7 +99,7 @@ const StudentOnboard = () => {
             <StudentOnboardingForm
                 onSubmit={handleOnboardingComplete}
                 onCancel={handleCancel}
-                // isSubmitting={isPending}
+                isSubmitting={isPending}
             />
         </div>
     );

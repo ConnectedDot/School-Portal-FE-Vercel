@@ -1,7 +1,8 @@
 import type { TeacherData } from "@/types/teachers";
 import { useCreateItem, useGetItems, useGetItem, useUpdateItem, useDeleteItem, useGetPaginatedItem } from "./general";
 import { axiosInstance } from "@/axios-Instance";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAdminUsersQuery } from './adminUsers';
 
 export interface CreateTeacherDto {
     email: string;
@@ -30,18 +31,15 @@ export interface UpdateTeacherProfileDto {
 
 // Get all teachers with pagination (admin endpoint - backward compatibility)
 export const useGetTeachers = (page: number = 1, limit: number = 20, autoFetchAll: boolean = false) => {
-    return useGetPaginatedItem<TeacherData>({
-        relativeUrl: '/admin/all-users',
-        limit,
-        autoFetchAll,
-        enabled: true,
-    });
+    void page; void limit; void autoFetchAll;
+    const query = useAdminUsersQuery();
+    return { ...query, data: query.data?.filter((user) => user.role === 'TEACHER') as TeacherData[] | undefined };
 };
 
 // Get single teacher by ID (backward compatibility)
 export const useGetTeacher = (id: string, enabled: boolean = true) => {
     return useGetItem<TeacherData>(
-        '/teacher/profile',
+        '/admin/teachers',
         id,
         undefined,
         { enabled: !!id && enabled }
@@ -64,16 +62,17 @@ export const useCreateTeacher = (
 
 // Update teacher (backward compatibility)
 export const useUpdateTeacher = (
+    id: string,
     onSuccessFn?: (data: any) => Promise<any>
 ) => {
-    return useUpdateItem<TeacherData>(
-        '/teacher/update-profile',
-        'Teacher updated successfully',
-        onSuccessFn,
-        false, // Not form data
-        true,  // Show success alert
-        true   // Show error alert
-    );
+    const client = useQueryClient();
+    return useMutation({
+        mutationFn: async (body: Partial<TeacherData>) => (await axiosInstance.patch(`/admin/teachers/${id}`, body)).data,
+        onSuccess: async (data) => {
+            await client.invalidateQueries({ queryKey: ['/admin/teachers'] });
+            if (onSuccessFn) await onSuccessFn(data);
+        },
+    });
 };
 
 // Delete teacher (backward compatibility)
@@ -215,4 +214,21 @@ export const useDeleteCertification = () => {
         true, // Show success alert
         true  // Show error alert
     );
+};
+
+export const useChangeTeacherPassword = () => useMutation({
+    mutationFn: async (body: { oldPassword: string; newPassword: string; confirmPassword: string }) =>
+        (await axiosInstance.patch('/teacher/change-password', body)).data,
+});
+
+export const useUploadTeacherAvatar = () => {
+    const client = useQueryClient();
+    return useMutation({
+        mutationFn: async (file: File) => {
+            const form = new FormData();
+            form.append('file', file);
+            return (await axiosInstance.post('/teacher/upload-avatar', form)).data;
+        },
+        onSuccess: () => client.invalidateQueries({ queryKey: ['/teacher/profile'] }),
+    });
 };
