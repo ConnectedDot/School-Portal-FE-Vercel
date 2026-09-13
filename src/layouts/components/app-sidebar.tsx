@@ -136,17 +136,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	};
 
 	return (
-		<Sidebar collapsible="icon" className="border-r border-slate-200/80 bg-white/95 backdrop-blur-xl dark:border-white/10 dark:bg-[#080808]/95" {...props}>
+		<Sidebar collapsible="icon" className="border-r border-slate-200/80 bg-white/95 backdrop-blur-xl dark:border-white/10 dark:bg-[#0a0a0a]/95" {...props}>
 			<div className="flex h-full flex-col p-2.5">
-				<SidebarHeader className="rounded-2xl border border-slate-200/80 bg-white p-2 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+				<SidebarHeader className="rounded-2xl border border-slate-200/80 bg-white p-2 shadow-sm dark:border-white/10 dark:bg-[#0f0f15]">
 					<TeamSwitcher teams={data.teams} />
 				</SidebarHeader>
 
-				<SidebarContent className="custom-scrollbar mt-3 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-2 shadow-sm dark:border-white/10 dark:bg-white/[0.035]">
+				<SidebarContent className="custom-scrollbar mt-3 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-2 shadow-sm dark:border-white/10 dark:bg-[#0f0f15]">
 					<NavMain items={data.navMain} />
 				</SidebarContent>
 
-				<SidebarFooter className="mt-3 rounded-2xl border border-slate-200/80 bg-white p-2 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+				<SidebarFooter className="mt-3 rounded-2xl border border-slate-200/80 bg-white p-2 shadow-sm dark:border-white/10 dark:bg-[#0f0f15]">
 					<NavUser user={data.user} />
 				</SidebarFooter>
 			</div>

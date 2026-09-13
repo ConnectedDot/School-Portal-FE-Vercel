@@ -91,7 +91,9 @@ export default {
 			boxShadow: {
 				premium: "0 18px 50px rgba(15, 23, 42, 0.10)",
 				glass: "0 12px 35px rgba(15, 23, 42, 0.10)",
-				glow: "0 0 40px rgba(216, 113, 8, 0.22)",
+				glow: "0 0 40px rgba(24, 95, 53, 0.22)",
+				"card-glow": "0 8px 30px rgba(0, 0, 0, 0.3)",
+				"card-subtle": "0 4px 20px rgba(0, 0, 0, 0.15)",
 			},
 			backgroundImage: {
 				"grid-pattern":
@@ -131,6 +133,14 @@ export default {
 					"0%": { opacity: "0", transform: "scale(0.95)" },
 					"100%": { opacity: "1", transform: "scale(1)" },
 				},
+				"gradient-x": {
+					"0%, 100%": {
+						"background-position": "0% 50%",
+					},
+					"50%": {
+						"background-position": "100% 50%",
+					},
+				},
 			},
 			animation: {
 				"accordion-down": "accordion-down 0.2s ease-out",
@@ -140,6 +150,7 @@ export default {
 				"fade-in-down": "fade-in-down 0.7s ease-out",
 				"slide-in-right": "slide-in-right 0.5s ease-out",
 				"scale-up": "scale-up 0.35s ease-out",
+				"gradient-x": "gradient-x 3s ease infinite",
 			},
 		},
 	},

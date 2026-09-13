@@ -36,67 +36,67 @@ body,
 		--card-foreground: 240 10% 3.9%;
 		--popover: 0 0% 100%;
 		--popover-foreground: 240 10% 3.9%;
-		--primary: 28 97% 48%;
+		--primary: 24 95% 53%;
 		--primary-foreground: 0 0% 98%;
 		--secondary: 240 5.9% 96.1%;
 		--secondary-foreground: 240 5.9% 10%;
 		--muted: 240 4.8% 95.9%;
 		--muted-foreground: 240 3.8% 46.1%;
-		--accent: 28 97% 48%;
+		--accent: 24 95% 53%;
 		--accent-foreground: 0 0% 98%;
 		--destructive: 0 84.2% 60.2%;
 		--destructive-foreground: 0 0% 98%;
 		--border: 240 5.9% 90%;
 		--input: 240 5.9% 90%;
-		--ring: 28 97% 48%;
-		--chart-1: 28 97% 48%;
+		--ring: 24 95% 53%;
+		--chart-1: 24 95% 53%;
 		--chart-2: 221 83% 53%;
 		--chart-3: 142 71% 45%;
 		--chart-4: 38 92% 50%;
 		--chart-5: 262 83% 58%;
 		--sidebar-background: 0 0% 100%;
 		--sidebar-foreground: 240 10% 3.9%;
-		--sidebar-primary: 28 97% 48%;
+		--sidebar-primary: 24 95% 53%;
 		--sidebar-primary-foreground: 0 0% 98%;
-		--sidebar-accent: 28 97% 96%;
-		--sidebar-accent-foreground: 28 97% 30%;
+		--sidebar-accent: 24 95% 96%;
+		--sidebar-accent-foreground: 0 0% 98%;
 		--sidebar-border: 240 5.9% 90%;
-		--sidebar-ring: 28 97% 48%;
+		--sidebar-ring: 24 95% 53%;
 	}
 
 	.dark {
-		--background: 228 14% 8%;
-		--foreground: 40 14% 96%;
-		--card: 228 12% 12%;
-		--card-foreground: 40 14% 96%;
-		--popover: 228 11% 15%;
-		--popover-foreground: 40 14% 96%;
-		--primary: 28 97% 48%;
+		--background: 220 14% 6%;
+		--foreground: 0 0% 95%;
+		--card: 218 16% 9%;
+		--card-foreground: 0 0% 95%;
+		--popover: 218 16% 11%;
+		--popover-foreground: 0 0% 95%;
+		--primary: 24 95% 53%;
 		--primary-foreground: 0 0% 98%;
-		--secondary: 226 10% 18%;
-		--secondary-foreground: 0 0% 98%;
-		--muted: 226 10% 17%;
-		--muted-foreground: 225 8% 68%;
-		--accent: 28 97% 48%;
+		--secondary: 220 12% 15%;
+		--secondary-foreground: 0 0% 95%;
+		--muted: 220 12% 14%;
+		--muted-foreground: 215 10% 65%;
+		--accent: 24 95% 53%;
 		--accent-foreground: 0 0% 98%;
 		--destructive: 0 62.8% 30.6%;
 		--destructive-foreground: 0 0% 98%;
-		--border: 225 9% 24%;
-		--input: 225 9% 22%;
-		--ring: 28 97% 48%;
-		--chart-1: 28 97% 48%;
+		--border: 217 10% 18%;
+		--input: 217 10% 16%;
+		--ring: 24 95% 53%;
+		--chart-1: 24 95% 53%;
 		--chart-2: 217 91% 60%;
 		--chart-3: 142 71% 45%;
 		--chart-4: 38 92% 50%;
 		--chart-5: 262 83% 58%;
-		--sidebar-background: 228 15% 9%;
-		--sidebar-foreground: 40 14% 96%;
-		--sidebar-primary: 28 97% 48%;
+		--sidebar-background: 218 18% 8%;
+		--sidebar-foreground: 0 0% 95%;
+		--sidebar-primary: 24 95% 53%;
 		--sidebar-primary-foreground: 0 0% 98%;
-		--sidebar-accent: 226 10% 18%;
+		--sidebar-accent: 220 12% 15%;
 		--sidebar-accent-foreground: 0 0% 98%;
-		--sidebar-border: 225 9% 22%;
-		--sidebar-ring: 28 97% 48%;
+		--sidebar-border: 217 10% 16%;
+		--sidebar-ring: 24 95% 53%;
 	}
 
 	* {
@@ -111,37 +111,37 @@ body,
 
 @layer components {
 	.fortis-page-shell {
-		@apply min-h-screen bg-slate-50 text-slate-950 dark:bg-background dark:text-foreground;
+		@apply min-h-screen bg-slate-50 text-slate-950 dark:bg-[#0a0a0a] dark:text-foreground;
 	}
 
 	.fortis-auth-shell {
-		@apply min-h-screen bg-[#050505] text-white;
+		@apply min-h-screen bg-[#0a0a0a] text-white;
 		background-image:
 			radial-gradient(
 				circle at 12% 18%,
-				rgba(216, 113, 8, 0.2),
+				rgba(24, 95, 53, 0.15),
 				transparent 28rem
 			),
 			radial-gradient(
 				circle at 86% 12%,
-				rgba(59, 130, 246, 0.16),
+				rgba(59, 130, 246, 0.12),
 				transparent 28rem
 			),
-			linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(5, 5, 5, 1));
+			linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(10, 10, 10, 1));
 	}
 
 	.fortis-dashboard-shell {
-		@apply min-h-screen bg-slate-50 dark:bg-background;
+		@apply min-h-screen bg-slate-50 dark:bg-[#0a0a0a];
 		background-image:
 			radial-gradient(
 				circle at top left,
-				rgba(249, 115, 22, 0.09),
-				transparent 30rem
+				rgba(24, 95, 53, 0.08),
+				transparent 24rem
 			),
 			radial-gradient(
 				circle at top right,
-				rgba(45, 212, 191, 0.07),
-				transparent 34rem
+				rgba(59, 130, 246, 0.06),
+				transparent 28rem
 			);
 		background-attachment: fixed;
 	}
@@ -155,11 +155,23 @@ body,
 	}
 
 	.premium-card {
-		@apply rounded-3xl border border-slate-200/80 bg-white shadow-premium transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl dark:border-border dark:bg-card dark:shadow-black/20;
+		@apply rounded-2xl border border-slate-200/80 bg-white shadow-premium transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl dark:border-white/10 dark:bg-[#0f0f15] dark:shadow-xl dark:hover:shadow-2xl;
 	}
 
 	.dark-card {
-		@apply rounded-3xl border border-border bg-card shadow-glass backdrop-blur-xl;
+		@apply rounded-2xl border border-white/10 bg-[#0f0f15] shadow-glass backdrop-blur-xl;
+	}
+
+	.premium-table {
+		@apply rounded-2xl border border-slate-200/80 bg-white shadow-premium dark:border-white/10 dark:bg-[#0f0f15] dark:shadow-xl;
+	}
+
+	.premium-table-row {
+		@apply border-b border-slate-100/80 hover:bg-slate-50/50 dark:border-white/5 dark:hover:bg-white/[0.03] transition-colors;
+	}
+
+	.premium-table-header {
+		@apply bg-slate-50/80 text-slate-700 dark:bg-white/[0.05] dark:text-slate-300;
 	}
 
 	.heading-display {
@@ -183,7 +195,7 @@ body,
 	}
 
 	.fortis-gradient-text {
-		@apply bg-gradient-to-r from-brand-400 via-brand-600 to-amber-300 bg-clip-text text-transparent;
+		@apply bg-gradient-to-r from-brand-400 via-brand-600 to-amber-300 bg-clip-text text-transparent animate-gradient-x bg-[length:200%_auto];
 	}
 
 	.fortis-primary-button {

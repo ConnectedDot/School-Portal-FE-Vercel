@@ -67,7 +67,7 @@ export function NavMain({
                                         <SidebarMenuButton
                                             tooltip={item.title}
                                             isActive={isActive || hasActiveSubItem}
-                                            className="h-10 rounded-xl px-3 font-semibold data-[active=true]:bg-brand-50 data-[active=true]:text-brand-700 dark:data-[active=true]:bg-brand-500/10 dark:data-[active=true]:text-brand-300"
+                                            className="h-10 rounded-xl px-3 font-semibold data-[active=true]:bg-brand-50 data-[active=true]:text-brand-700 dark:data-[active=true]:bg-brand-500/15 dark:data-[active=true]:text-brand-300"
                                         >
                                             {item.icon && <item.icon className="h-4 w-4" />}
                                             <span>{item.title}</span>
@@ -83,7 +83,7 @@ export function NavMain({
                                                         <SidebarMenuSubButton
                                                             asChild
                                                             isActive={isSubItemActive}
-                                                            className="h-8 rounded-lg text-[13px] font-semibold data-[active=true]:bg-brand-50 data-[active=true]:text-brand-700 dark:data-[active=true]:bg-brand-500/10 dark:data-[active=true]:text-brand-300"
+                                                            className="h-8 rounded-lg text-[13px] font-semibold data-[active=true]:bg-brand-50 data-[active=true]:text-brand-700 dark:data-[active=true]:bg-brand-500/15 dark:data-[active=true]:text-brand-300"
                                                         >
                                                             <button
                                                                 className="cursor-pointer w-full text-left"
@@ -109,7 +109,7 @@ export function NavMain({
                                 asChild
                                 tooltip={item.title}
                                 isActive={isActive}
-                                className="h-10 rounded-xl px-3 font-semibold data-[active=true]:bg-brand-50 data-[active=true]:text-brand-700 dark:data-[active=true]:bg-brand-500/10 dark:data-[active=true]:text-brand-300"
+                                className="h-10 rounded-xl px-3 font-semibold data-[active=true]:bg-brand-50 data-[active=true]:text-brand-700 dark:data-[active=true]:bg-brand-500/15 dark:data-[active=true]:text-brand-300"
                             >
                                 <button
                                     className="cursor-pointer w-full text-left"
