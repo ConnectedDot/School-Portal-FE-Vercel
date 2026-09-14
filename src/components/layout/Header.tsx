@@ -72,7 +72,7 @@ export const Header = () => {
 						<Menu className="h-5 w-5" />
 					</SidebarTrigger>
 
-					<div className="hidden min-w-0 flex-1 md:block">
+					{/* <div className="hidden min-w-0 flex-1 md:block">
 						<div className="relative max-w-xl">
 							<Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 							<Input
@@ -84,12 +84,12 @@ export const Header = () => {
 								<Command className="h-3 w-3" /> K
 							</div>
 						</div>
-					</div>
+					</div> */}
 
 					<div className="ml-auto flex items-center gap-2">
-						<Badge className="hidden rounded-full border-brand-200 bg-brand-50 px-3 py-1 text-brand-700 hover:bg-brand-50 dark:border-white/10 dark:bg-white/5 dark:text-brand-300 sm:inline-flex">
+						{/* <Badge className="hidden rounded-full border-brand-200 bg-brand-50 px-3 py-1 text-brand-700 hover:bg-brand-50 dark:border-white/10 dark:bg-white/5 dark:text-brand-300 sm:inline-flex">
 							<ShieldCheck className="mr-1 h-3.5 w-3.5" /> Secure Portal
-						</Badge>
+						</Badge> */}
 
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>

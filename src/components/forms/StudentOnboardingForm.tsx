@@ -506,9 +506,9 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
                                                             <SelectItem value="JSS_1">JSS 1</SelectItem>
                                                             <SelectItem value="JSS_2">JSS 2</SelectItem>
                                                             <SelectItem value="JSS_3">JSS 3</SelectItem>
-                                                            <SelectItem value="SSS_1">SSS 1</SelectItem>
-                                                            <SelectItem value="SSS_2">SSS 2</SelectItem>
-                                                            <SelectItem value="SSS_3">SSS 3</SelectItem>
+                                                            <SelectItem value="SS_1">SS 1</SelectItem>
+                                                            <SelectItem value="SS_2">SS 2</SelectItem>
+                                                            <SelectItem value="SS_3">SS 3</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
