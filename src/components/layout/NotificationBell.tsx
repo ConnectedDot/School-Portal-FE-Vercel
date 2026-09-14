@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 // import { ScrollArea } from '@/components/ui/scroll-area';
@@ -44,14 +44,6 @@ export const NotificationBell = () => {
 
     const [isOpen, setIsOpen] = useState(false);
     const unreadCount = unreadData?.unreadCount || 0;
-
-    // Auto-refresh notifications every 30 seconds
-    useEffect(() => {
-        const interval = setInterval(() => {
-            refetch();
-        }, 30000);
-        return () => clearInterval(interval);
-    }, [refetch]);
 
     const getNotificationIcon = (type: string) => {
         switch (type) {

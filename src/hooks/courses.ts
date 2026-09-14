@@ -13,6 +13,7 @@ export interface Course {
     allowedDepartments: string[];
     teacher?: any;
     enrollmentCount?: number;
+    enrollments?: Array<Record<string, any>>;
     createdAt?: string;
     updatedAt?: string;
     // Legacy fields for backward compatibility
@@ -85,10 +86,14 @@ export const useGetMyCourses = () => {
 export const useCreateCourse = (
     onSuccessFn?: (data: any) => Promise<any>
 ) => {
+    const client = useQueryClient();
     return useCreateItem<Course>(
         '/course/create',
         'Course created successfully',
-        onSuccessFn,
+        async (data) => {
+            await client.invalidateQueries({ queryKey: ['/course/all'] });
+            if (onSuccessFn) await onSuccessFn(data);
+        },
         false, // Not form data
         true,  // Show success alert
         true   // Show error alert
@@ -100,10 +105,15 @@ export const useUpdateCourse = (
     id: string,
     onSuccessFn?: (data: any) => Promise<any>
 ) => {
+    const client = useQueryClient();
     return useUpdateItem<Course>(
         '/course/update',
         'Course updated successfully',
-        onSuccessFn,
+        async (data) => {
+            await client.invalidateQueries({ queryKey: ['/course/all'] });
+            await client.invalidateQueries({ queryKey: ['/course', id] });
+            if (onSuccessFn) await onSuccessFn(data);
+        },
         false, // Not form data
         true,  // Show success alert
         true   // Show error alert

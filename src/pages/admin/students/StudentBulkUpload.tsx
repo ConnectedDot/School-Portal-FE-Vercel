@@ -18,6 +18,7 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { IonIcon } from '@ionic/react';
 import { person } from 'ionicons/icons';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
 interface StudentData {
     _rowId?: string; // Unique identifier for tracking rows
@@ -53,6 +54,7 @@ const StudentBulkUpload = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingRow, setEditingRow] = useState<{ index: number; data: StudentData } | null>(null);
     const [editFormData, setEditFormData] = useState<StudentData>({} as StudentData);
+    const [rowToDelete, setRowToDelete] = useState<StudentData | null>(null);
 
     const { mutate: bulkUploadStudents, isPending } = useBulkUploadStudents(
         async () => {
@@ -605,12 +607,7 @@ const StudentBulkUpload = () => {
             label: 'Delete',
             icon: Trash2,
             variant: 'destructive',
-            onClick: (student: StudentData) => {
-                if (confirm('Are you sure you want to delete this student record?')) {
-                    const index = parsedData.findIndex(s => s._rowId === student._rowId);
-                    if (index !== -1) handleDeleteRow(index);
-                }
-            },
+            onClick: setRowToDelete,
         },
     ];
 
@@ -897,7 +894,7 @@ const StudentBulkUpload = () => {
                                     searchPlaceholder="Search students by name, email, grade..."
                                     actions={actions}
                                     pagination
-                                    pageSize={10}
+                                    pageSize={5}
                                     emptyMessage="No student records to preview."
                                 />
                             </CardContent>
@@ -1141,6 +1138,21 @@ const StudentBulkUpload = () => {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            <ConfirmDialog
+                isOpen={!!rowToDelete}
+                onClose={() => setRowToDelete(null)}
+                onConfirm={() => {
+                    if (!rowToDelete) return;
+                    const index = parsedData.findIndex(student => student._rowId === rowToDelete._rowId);
+                    if (index !== -1) handleDeleteRow(index);
+                    setRowToDelete(null);
+                }}
+                title="Remove imported row?"
+                description={`Remove ${rowToDelete?.firstName || 'this student'} ${rowToDelete?.lastName || ''} from the pending upload? This only changes the local preview and does not delete an existing portal account.`}
+                confirmText="Remove row"
+                cancelText="Keep row"
+                variant="destructive"
+            />
         </div>
     );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -107,6 +107,7 @@ export interface ShadcnDataTableProps<T> {
     // Pagination
     pagination?: boolean;
     pageSize?: number;
+    pageSizeOptions?: number[];
     totalItems?: number;
     currentPage?: number;
     onPageChange?: (page: number) => void;
@@ -144,7 +145,8 @@ export function ShadcnDataTable<T>({
     actions = [],
     bulkActions = [],
     pagination = true,
-    pageSize = 10,
+    pageSize = 5,
+    pageSizeOptions = [5, 10, 25, 50],
     totalItems,
     currentPage = 1,
     onPageChange,
@@ -161,6 +163,10 @@ export function ShadcnDataTable<T>({
     } | null>(null);
     const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
     const [internalCurrentPage, setInternalCurrentPage] = useState(currentPage);
+    const [internalPageSize, setInternalPageSize] = useState(pageSize);
+
+    useEffect(() => setInternalCurrentPage(currentPage), [currentPage]);
+    useEffect(() => setInternalPageSize(pageSize), [pageSize]);
 
     const readValue = (item: any, key: string) => {
         return key.split('.').reduce((value, part) => value?.[part], item);
@@ -169,6 +175,7 @@ export function ShadcnDataTable<T>({
     // Handle search
     const handleSearch = (query: string) => {
         setSearchQuery(query);
+        setInternalCurrentPage(1);
         if (onSearch) {
             onSearch(query);
         }
@@ -196,6 +203,7 @@ export function ShadcnDataTable<T>({
             newFilters[filterKey] = value;
         }
         setActiveFilters(newFilters);
+        setInternalCurrentPage(1);
 
         if (onFilterChange) {
             onFilterChange(filterKey, value);
@@ -242,10 +250,10 @@ export function ShadcnDataTable<T>({
     const paginatedData = useMemo(() => {
         if (!pagination) return processedData;
 
-        const start = (internalCurrentPage - 1) * pageSize;
-        const end = start + pageSize;
+        const start = (internalCurrentPage - 1) * internalPageSize;
+        const end = start + internalPageSize;
         return processedData.slice(start, end);
-    }, [processedData, internalCurrentPage, pageSize, pagination]);
+    }, [processedData, internalCurrentPage, internalPageSize, pagination]);
 
     // Handle selection
     const handleSelectAll = (checked: boolean) => {
@@ -271,13 +279,17 @@ export function ShadcnDataTable<T>({
     };
 
     // Calculate pagination
-    const totalPages = Math.ceil((totalItems || processedData.length) / pageSize);
+    const recordCount = totalItems ?? processedData.length;
+    const totalPages = Math.max(1, Math.ceil(recordCount / internalPageSize));
+    useEffect(() => {
+        if (internalCurrentPage > totalPages) setInternalCurrentPage(totalPages);
+    }, [internalCurrentPage, totalPages]);
     const isAllSelected = paginatedData.length > 0 &&
         paginatedData.every(item => selectedItems.includes(keyExtractor(item)));
     const isIndeterminate = paginatedData.some(item => selectedItems.includes(keyExtractor(item))) && !isAllSelected;
 
     return (
-        <Card className={`overflow-hidden rounded-3xl border-slate-200/80 bg-white/90 shadow-premium dark:border-border dark:bg-card ${className || ''}`}>
+        <Card className={`overflow-hidden rounded-2xl border-slate-200/60 bg-white/90 shadow-premium dark:border-transparent dark:bg-[#0f0f15] dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)] ${className || ''}`}>
             <CardHeader className="gap-5">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="space-y-2">
@@ -318,7 +330,7 @@ export function ShadcnDataTable<T>({
                                 placeholder={searchPlaceholder}
                                 value={searchQuery}
                                 onChange={(e) => handleSearch(e.target.value)}
-                                className="h-11 rounded-full border-slate-200 bg-slate-50/80 pl-10 dark:border-border dark:bg-muted/70"
+                                className="h-11 rounded-full border-slate-200 bg-slate-50/80 pl-10 dark:border-white/10 dark:bg-[#0f0f15]"
                             />
                         </div>
                     )}
@@ -371,7 +383,7 @@ export function ShadcnDataTable<T>({
             </CardHeader>
 
             <CardContent>
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-border dark:bg-background/35">
+                <div className="overflow-hidden rounded-2xl border border-slate-200/60 bg-white dark:border-transparent dark:bg-[#0f0f15]">
                     <div className="custom-scrollbar w-full overflow-x-auto">
                     <Table>
                         <TableHeader>
@@ -383,7 +395,7 @@ export function ShadcnDataTable<T>({
                                             onCheckedChange={handleSelectAll}
                                             ref={(el) => {
                                                 if (el && 'indeterminate' in el) {
-                                                    (el as HTMLInputElement).indeterminate = isIndeterminate;
+                                                    (el as any).indeterminate = isIndeterminate;
                                                 }
                                             }}
                                         />
@@ -456,7 +468,7 @@ export function ShadcnDataTable<T>({
                                                 <TableCell>
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
+                                                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full border-0 shadow-none focus-visible:ring-1">
                                                                 <MoreHorizontal className="h-4 w-4" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
@@ -489,12 +501,34 @@ export function ShadcnDataTable<T>({
                 </div>
 
                 {/* Pagination */}
-                {pagination && totalPages > 1 && (
+                {pagination && (
                     <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="text-sm text-muted-foreground">
-                            Showing {(internalCurrentPage - 1) * pageSize + 1} to{' '}
-                            {Math.min(internalCurrentPage * pageSize, totalItems || processedData.length)} of{' '}
-                            {totalItems || processedData.length} entries
+                        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                            <span>
+                                {recordCount === 0
+                                    ? 'Showing 0 entries'
+                                    : `Showing ${(internalCurrentPage - 1) * internalPageSize + 1} to ${Math.min(internalCurrentPage * internalPageSize, recordCount)} of ${recordCount} entries`}
+                            </span>
+                            <div className="flex items-center gap-2">
+                                <span>Rows per page</span>
+                                <Select
+                                    value={String(internalPageSize)}
+                                    onValueChange={(value) => {
+                                        setInternalPageSize(Number(value));
+                                        setInternalCurrentPage(1);
+                                        onPageChange?.(1);
+                                    }}
+                                >
+                                    <SelectTrigger className="h-9 w-[76px] rounded-full border-border/70 bg-background/40">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {[...new Set(pageSizeOptions)].sort((a, b) => a - b).map(option => (
+                                            <SelectItem key={option} value={String(option)}>{option}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
                             <Button
@@ -529,7 +563,7 @@ export function ShadcnDataTable<T>({
                                                 <Button
                                                     variant={page === internalCurrentPage ? 'default' : 'outline'}
                                                     size="sm"
-                                                    className="h-9 min-w-9 rounded-full"
+                                                    className="h-9 min-w-9 rounded-full border-border/60"
                                                     onClick={() => {
                                                         setInternalCurrentPage(page);
                                                         onPageChange?.(page);

@@ -5,6 +5,7 @@ import { ArrowLeft, Edit, BookOpen, Calendar, MapPin, Award, User, Users, Loader
 import { useGetCourse } from '@/hooks/courses';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { formatEnumLabel } from '@/lib/data-parser';
 
 const CourseView = () => {
     const navigate = useNavigate();
@@ -12,13 +13,14 @@ const CourseView = () => {
     
     const { data: course, isLoading, error } = useGetCourse(id!);
 
-    // if (isLoading) {
-    //     return (
-    //         <div className="flex items-center justify-center h-96">
-    //             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-    //         </div>
-    //     );
-    // }
+    if (isLoading) {
+        return (
+            <div className="flex min-h-96 flex-col items-center justify-center gap-3" role="status" aria-live="polite">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground">Loading course details…</p>
+            </div>
+        );
+    }
 
     if (error || !course) {
         return (
@@ -31,6 +33,10 @@ const CourseView = () => {
             </div>
         );
     }
+
+    const enrollmentCount = Array.isArray(course.enrollments)
+        ? course.enrollments.length
+        : (course.enrollmentCount ?? 0);
 
     return (
         <div className="space-y-6">
@@ -75,10 +81,10 @@ const CourseView = () => {
                                     <h2 className="text-2xl font-bold">{course.title}</h2>
                                     <div className="flex items-center gap-2 mt-1">
                                         <Badge variant="secondary">
-                                            {course.subject}
+                                            {formatEnumLabel(course.subject, 'Not specified')}
                                         </Badge>
                                         <Badge variant="outline">
-                                            {course.courseType}
+                                            {formatEnumLabel(course.courseType, 'Not specified')}
                                         </Badge>
                                     </div>
                                 </div>
@@ -86,7 +92,7 @@ const CourseView = () => {
                         <div className="text-right">
                             <div className="flex items-center gap-2">
                                 <Users className="h-5 w-5 text-muted-foreground" />
-                                <span className="text-2xl font-bold">{course.enrollmentCount || 0}</span>
+                                <span className="text-2xl font-bold">{enrollmentCount}</span>
                             </div>
                             <p className="text-sm text-muted-foreground">Enrolled Students</p>
                         </div>
@@ -115,25 +121,25 @@ const CourseView = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <span className="text-sm font-medium">Subject:</span>
-                                <p className="text-sm text-muted-foreground">{course.subject}</p>
+                                <p className="text-sm text-muted-foreground">{formatEnumLabel(course.subject, 'Not specified')}</p>
                             </div>
                             <div className="space-y-2">
                                 <span className="text-sm font-medium">Course Type:</span>
-                                <p className="text-sm text-muted-foreground">{course.courseType}</p>
+                                <p className="text-sm text-muted-foreground">{formatEnumLabel(course.courseType, 'Not specified')}</p>
                             </div>
                             {Array.isArray(course.allowedDepartments) && course.allowedDepartments.length > 0 && (
                                 <div className="space-y-2 md:col-span-2">
                                     <span className="text-sm font-medium">Allowed Departments:</span>
                                     <div className="flex flex-wrap gap-2">
                                         {course.allowedDepartments.map((dept: string) => (
-                                            <Badge key={dept} variant="secondary">{dept}</Badge>
+                                            <Badge key={dept} variant="secondary">{formatEnumLabel(dept)}</Badge>
                                         ))}
                                     </div>
                                 </div>
                             )}
                             <div className="space-y-2">
                                 <span className="text-sm font-medium">Enrollment Count:</span>
-                                <p className="text-sm text-muted-foreground">{course.enrollmentCount ?? 0} students</p>
+                                <p className="text-sm text-muted-foreground">{enrollmentCount} students</p>
                             </div>
                             <div className="space-y-2">
                                 <span className="text-sm font-medium">Instructor:</span>

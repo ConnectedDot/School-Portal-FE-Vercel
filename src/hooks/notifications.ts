@@ -42,7 +42,7 @@ export const useGetUnreadCount = () => {
         '/notification/notifications/unread-count',
         '',
         undefined,
-        { enabled: true, refetchInterval: 30000 } // Refetch every 30 seconds
+        { enabled: true, staleTime: 5 * 60 * 1000, refetchOnWindowFocus: false }
     );
 };
 

@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { TeacherData } from '@/types/teachers';
+import { useGetAcademicYears } from '@/hooks/academicYear';
 
 
 
@@ -19,18 +20,29 @@ const FacultyEdit = () => {
     const { id } = useParams<{ id: any }>();
     
     const { data: teacher, isLoading: loadingTeacher } = useGetTeacher(id!);
+    const { data: academicYears = [] } = useGetAcademicYears();
     const { mutate: updateTeacher, isPending } = useUpdateTeacher(id!);
 
     const [formData, setFormData] = useState<TeacherData>({
         firstName: '',
         lastName: '',
-        email: '',
-        password: '',
         phone: '',
         dateOfBirth: '',
         gender: 'MALE',
         employmentType: "FULL_TIME",
-        // address: '',
+        address: '',
+        stateOfOrigin: '',
+        nationality: '',
+        yearsOfExperience: undefined,
+        salary: undefined,
+        bankName: '',
+        accountNumber: '',
+        emergencyContactName: '',
+        emergencyContactPhone: '',
+        emergencyContactRelation: '',
+        status: 'PENDING',
+        startAcademicYearId: '',
+        currentAcademicYearId: '',
         // department: '',
         // specialization: '',
         qualification: '',
@@ -44,13 +56,23 @@ const FacultyEdit = () => {
             setFormData({
                 firstName: teacher.firstName || '',
                 lastName: teacher.lastName || '',
-                email: teacher.email || '',
-                password: '', // or teacher.password if available
                 phone: teacher.phone || '',
                 dateOfBirth: teacher.dateOfBirth ? teacher.dateOfBirth.split('T')[0] : '',
                 gender: teacher.gender as 'MALE' | 'FEMALE' | 'OTHER' || 'MALE',
                 employmentType: teacher.employmentType || 'FULL_TIME',
-                // address: teacher.address || '',
+                address: teacher.address || '',
+                stateOfOrigin: teacher.stateOfOrigin || '',
+                nationality: teacher.nationality || '',
+                yearsOfExperience: teacher.yearsOfExperience ?? undefined,
+                salary: teacher.salary ?? undefined,
+                bankName: teacher.bankName || '',
+                accountNumber: teacher.accountNumber || '',
+                emergencyContactName: teacher.emergencyContactName || '',
+                emergencyContactPhone: teacher.emergencyContactPhone || '',
+                emergencyContactRelation: teacher.emergencyContactRelation || '',
+                status: teacher.status || 'PENDING',
+                startAcademicYearId: teacher.startAcademicYearId || '',
+                currentAcademicYearId: teacher.currentAcademicYearId || '',
                 // department: teacher.department || '',
                 // specialization: teacher.specialization || '',
                 qualification: teacher.qualification || '',
@@ -62,7 +84,13 @@ const FacultyEdit = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        updateTeacher(formData, {
+        const payload = {
+            ...formData,
+            yearsOfExperience: formData.yearsOfExperience === undefined || formData.yearsOfExperience === '' ? undefined : Number(formData.yearsOfExperience),
+            salary: formData.salary === undefined || formData.salary === '' ? undefined : Number(formData.salary),
+        };
+        delete payload.email;
+        updateTeacher(payload, {
             onSuccess: () => {
                 navigate(`${AdnPaths.FACULTY}/${id}`);
             },
@@ -156,17 +184,6 @@ const FacultyEdit = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="email">Email Address *</Label>
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        value={formData.email}
-                                        onChange={(e) => handleChange('email', e.target.value)}
-                                        placeholder="teacher@school.com"
-                                        required
-                                    />
-                                </div>
-                                <div className="space-y-2">
                                     <Label htmlFor="phoneNumber">Phone Number *</Label>
                                     <Input
                                         id="phoneNumber"
@@ -196,9 +213,9 @@ const FacultyEdit = () => {
                                             <SelectValue placeholder="Select gender" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="Male">Male</SelectItem>
-                                            <SelectItem value="Female">Female</SelectItem>
-                                            <SelectItem value="Other">Other</SelectItem>
+                                            <SelectItem value="MALE">Male</SelectItem>
+                                            <SelectItem value="FEMALE">Female</SelectItem>
+                                            <SelectItem value="OTHER">Other</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -213,16 +230,15 @@ const FacultyEdit = () => {
                                     />
                                 </div> */}
                             </div>
-                            {/* <div className="space-y-2">
-                                <Label htmlFor="address">Address *</Label>
+                            <div className="space-y-2">
+                                <Label htmlFor="address">Address</Label>
                                 <Textarea
                                     id="address"
-                                    value={formData.address}
+                                    value={formData.address || ''}
                                     onChange={(e) => handleChange('address', e.target.value)}
                                     placeholder="Enter full address"
-                                    required
                                 />
-                            </div> */}
+                            </div>
                         </div>
 
                         {/* Professional Information */}
@@ -259,6 +275,16 @@ const FacultyEdit = () => {
                                         required
                                     />
                                 </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="employmentType">Employment Type</Label>
+                                    <Select value={formData.employmentType} onValueChange={(value) => handleChange('employmentType', value)}><SelectTrigger id="employmentType"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="FULL_TIME">Full Time</SelectItem><SelectItem value="PART_TIME">Part Time</SelectItem><SelectItem value="CONTRACT">Contract</SelectItem><SelectItem value="INTERN">Intern</SelectItem></SelectContent></Select>
+                                </div>
+                                <div className="space-y-2"><Label htmlFor="yearsOfExperience">Years of Experience</Label><Input id="yearsOfExperience" type="number" min="0" value={formData.yearsOfExperience ?? ''} onChange={(e) => handleChange('yearsOfExperience', e.target.value)} /></div>
+                                <div className="space-y-2"><Label htmlFor="status">Account Status</Label><Select value={formData.status || 'PENDING'} onValueChange={(value) => handleChange('status', value)}><SelectTrigger id="status"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="PENDING">Pending</SelectItem><SelectItem value="ACTIVE">Active</SelectItem><SelectItem value="SUSPENDED">Suspended</SelectItem><SelectItem value="ON_LEAVE">On Leave</SelectItem><SelectItem value="TERMINATED">Terminated</SelectItem></SelectContent></Select></div>
+                                <div className="space-y-2"><Label htmlFor="nationality">Nationality</Label><Input id="nationality" value={formData.nationality || ''} onChange={(e) => handleChange('nationality', e.target.value)} /></div>
+                                <div className="space-y-2"><Label htmlFor="stateOfOrigin">State of Origin</Label><Input id="stateOfOrigin" value={formData.stateOfOrigin || ''} onChange={(e) => handleChange('stateOfOrigin', e.target.value)} /></div>
+                                <div className="space-y-2"><Label htmlFor="startAcademicYearId">Starting Academic Year</Label><Select value={formData.startAcademicYearId || undefined} onValueChange={(value) => handleChange('startAcademicYearId', value)}><SelectTrigger id="startAcademicYearId"><SelectValue placeholder="Select academic year" /></SelectTrigger><SelectContent>{academicYears.map(year => <SelectItem key={year.id} value={year.id}>{year.name}</SelectItem>)}</SelectContent></Select></div>
+                                <div className="space-y-2"><Label htmlFor="currentAcademicYearId">Current Academic Year</Label><Select value={formData.currentAcademicYearId || undefined} onValueChange={(value) => handleChange('currentAcademicYearId', value)}><SelectTrigger id="currentAcademicYearId"><SelectValue placeholder="Select academic year" /></SelectTrigger><SelectContent>{academicYears.map(year => <SelectItem key={year.id} value={year.id}>{year.name}</SelectItem>)}</SelectContent></Select></div>
                                 {/* <div className="space-y-2">
                                     <Label htmlFor="experience">Years of Experience *</Label>
                                     <Input
@@ -271,6 +297,15 @@ const FacultyEdit = () => {
                                 </div> */}
                             </div>
                         </div>
+
+                        <div className="space-y-4"><h3 className="text-lg font-semibold">Emergency & Payroll Information</h3><div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <div className="space-y-2"><Label htmlFor="emergencyContactName">Emergency Contact Name</Label><Input id="emergencyContactName" value={formData.emergencyContactName || ''} onChange={(e) => handleChange('emergencyContactName', e.target.value)} /></div>
+                            <div className="space-y-2"><Label htmlFor="emergencyContactPhone">Emergency Contact Phone</Label><Input id="emergencyContactPhone" value={formData.emergencyContactPhone || ''} onChange={(e) => handleChange('emergencyContactPhone', e.target.value)} /></div>
+                            <div className="space-y-2"><Label htmlFor="emergencyContactRelation">Relationship</Label><Input id="emergencyContactRelation" value={formData.emergencyContactRelation || ''} onChange={(e) => handleChange('emergencyContactRelation', e.target.value)} /></div>
+                            <div className="space-y-2"><Label htmlFor="salary">Salary</Label><Input id="salary" type="number" min="0" value={formData.salary ?? ''} onChange={(e) => handleChange('salary', e.target.value)} /></div>
+                            <div className="space-y-2"><Label htmlFor="bankName">Bank Name</Label><Input id="bankName" value={formData.bankName || ''} onChange={(e) => handleChange('bankName', e.target.value)} /></div>
+                            <div className="space-y-2"><Label htmlFor="accountNumber">Account Number</Label><Input id="accountNumber" value={formData.accountNumber || ''} onChange={(e) => handleChange('accountNumber', e.target.value)} /></div>
+                        </div></div>
 
                         {/* Actions */}
                         <div className="flex items-center justify-end gap-3 pt-4">

@@ -1,18 +1,10 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useNavigate } from "react-router-dom"
-import {
-    ChevronsUpDown,
-    LogOut,
-    UserRound,
-} from "lucide-react"
+import * as React from "react";
+import { useNavigate } from "react-router-dom";
+import { ChevronsUpDown, LogOut, UserRound } from "lucide-react";
 
-import {
-    Avatar,
-    AvatarFallback,
-    AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -20,30 +12,35 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
     useSidebar,
-} from "@/components/ui/sidebar"
-import { AuthContext } from "@/contexts/AuthContext"
+} from "@/components/ui/sidebar";
+import { AuthContext } from "@/contexts/AuthContext";
 
-export function NavUser({
-    user,
-}: {
-    user: any
-}) {
-    const { isMobile, state } = useSidebar()
-    const { logout } = React.useContext(AuthContext)
-    const navigate = useNavigate()
+export function NavUser({ user }: { user: any }) {
+    const { isMobile, state } = useSidebar();
+    const { logout } = React.useContext(AuthContext);
+    const navigate = useNavigate();
+
+    const openProfile = () => {
+        const role = user?.role?.toUpperCase();
+        if (role === 'STUDENT') navigate('/sdt/profile');
+        else if (role === 'TEACHER') navigate('/fcy/profile');
+        else if (role === 'ADMINISTRATOR') navigate('/adn/profile');
+        else navigate('/gdn/profile');
+    };
+
 
     const handleLogout = () => {
-        logout()
-        navigate("/login", { replace: true })
-    }
+        logout();
+        navigate("/login", { replace: true });
+    };
 
-    const isCollapsed = state === "collapsed"
+    const isCollapsed = state === "collapsed";
 
     return (
         <SidebarMenu>
@@ -63,7 +60,9 @@ export function NavUser({
                             {!isCollapsed && (
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-black">{user.name}</span>
-                                    <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+                                    <span className="truncate text-xs text-muted-foreground">
+                                        {user.email}
+                                    </span>
                                 </div>
                             )}
                             {!isCollapsed && <ChevronsUpDown className="ml-auto size-4" />}
@@ -90,7 +89,10 @@ export function NavUser({
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="gap-2 rounded-xl">
+                        <DropdownMenuItem
+                            className="gap-2 rounded-xl"
+                            onClick={openProfile}
+                        >
                             <UserRound className="h-4 w-4" />
                             Profile
                         </DropdownMenuItem>
@@ -105,5 +107,5 @@ export function NavUser({
                 </DropdownMenu>
             </SidebarMenuItem>
         </SidebarMenu>
-    )
+    );
 }

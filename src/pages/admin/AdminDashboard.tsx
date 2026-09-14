@@ -16,7 +16,6 @@ import {
     arrowForwardOutline,
     statsChartOutline,
     personAddOutline,
-    libraryOutline,
     clipboardOutline,
     documentsOutline,
     chatbubbleOutline,
@@ -33,6 +32,7 @@ import { useGetTeachers } from '@/hooks/teachers';
 import { useGetCourses } from '@/hooks/courses';
 import { useGetAllUsers } from '@/hooks/admin';
 import { AdnPaths } from '@/router/paths';
+import { formatEnumLabel, parseStudentLevel } from '@/lib/data-parser';
 
 export const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -60,7 +60,7 @@ export const AdminDashboard = () => {
             pendingStudents,
             totalTeachers: teachers.length,
             totalCourses: courses.length,
-            attendanceRate: 94,
+            attendanceRate: null,
             recentStudents: students.slice(0, 5),
             recentTeachers: teachers.slice(0, 3),
         };
@@ -108,14 +108,14 @@ export const AdminDashboard = () => {
         },
         {
             title: 'Attendance Rate',
-            value: `${stats.attendanceRate}%`,
-            change: '+2%',
+            value: stats.attendanceRate === null ? '—' : `${stats.attendanceRate}%`,
+            change: null,
             trend: 'up',
             icon: checkmarkCircleOutline,
             color: 'bg-primary',
             lightColor: 'bg-primary/10',
             textColor: 'text-primary',
-            description: 'This week',
+            description: 'No attendance summary supplied',
             onClick: () => navigate(AdnPaths.ATTENDANCE),
         },
     ];
@@ -150,13 +150,7 @@ export const AdminDashboard = () => {
             color: 'bg-orange-500',
             path: AdnPaths.REPORTS,
         },
-        {
-            title: 'Library',
-            description: 'Manage books',
-            icon: libraryOutline,
-            color: 'bg-pink-500',
-            path: AdnPaths.LIBRARY,
-        },
+        // Library action retained for a future release.
         {
             title: 'Calendar',
             description: 'School events',
@@ -169,9 +163,9 @@ export const AdminDashboard = () => {
     // System overview data
     const systemOverview = [
         { label: 'Pending Approvals', value: stats.pendingStudents, icon: alertCircleOutline, color: 'text-orange-500' },
-        { label: 'Active Sessions', value: '23', icon: timeOutline, color: 'text-green-500' },
-        { label: 'Total Revenue', value: '$45.2K', icon: walletOutline, color: 'text-blue-500' },
-        { label: 'Security Status', value: 'Secure', icon: shieldCheckmarkOutline, color: 'text-green-500' },
+        { label: 'Active Sessions', value: '—', icon: timeOutline, color: 'text-green-500' },
+        { label: 'Total Revenue', value: '—', icon: walletOutline, color: 'text-blue-500' },
+        { label: 'Security Status', value: '—', icon: shieldCheckmarkOutline, color: 'text-green-500' },
     ];
 
     if (isLoading) {
@@ -265,7 +259,7 @@ export const AdminDashboard = () => {
                 <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {systemOverview.map((item, index) => (
-                            <div key={index} className="flex items-center gap-3 p-4 border rounded-lg">
+                            <div key={index} className="flex items-center gap-3 rounded-2xl bg-muted/45 p-4 ring-1 ring-inset ring-border/30">
                                 <div className={`${item.color}`}>
                                     <IonIcon icon={item.icon} className="w-6 h-6" />
                                 </div>
@@ -333,7 +327,7 @@ export const AdminDashboard = () => {
                                 stats.recentStudents.map((student: any) => (
                                     <div 
                                         key={student.id} 
-                                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent transition-colors cursor-pointer"
+                                        className="flex items-center justify-between rounded-2xl bg-muted/35 p-3 ring-1 ring-inset ring-border/25 hover:bg-muted/65 transition-colors cursor-pointer"
                                         onClick={() => navigate(AdnPaths.STUDENTS_VIEW.replace(':id', student.id))}
                                     >
                                         <div className="flex items-center gap-3">
@@ -348,8 +342,10 @@ export const AdminDashboard = () => {
                                                     {student.firstName} {student.lastName}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground">
-                                                    {student.grade ? `Grade ${student.grade}` : 'SS 1'}
-                                                    {student.section ? ` - ${student.section}` : ''}
+                                                    {student.studentLevel || student.grade
+                                                        ? `Grade ${parseStudentLevel(student.studentLevel || student.grade)}`
+                                                        : 'Grade not assigned'}
+                                                    {student.department ? ` · ${formatEnumLabel(student.department)}` : ''}
                                                 </p>
                                             </div>
                                         </div>
@@ -395,7 +391,7 @@ export const AdminDashboard = () => {
                         <div className="space-y-4">
                             {stats.recentTeachers.length > 0 ? (
                                 stats.recentTeachers.map((teacher: any) => (
-                                    <div key={teacher.id} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent transition-colors">
+                                    <div key={teacher.id} className="flex items-center gap-3 rounded-2xl bg-muted/35 p-3 ring-1 ring-inset ring-border/25 hover:bg-muted/65 transition-colors">
                                         <Avatar className="h-12 w-12">
                                             <AvatarImage src={teacher.profilePicture} />
                                             <AvatarFallback className="bg-purple-500 text-white">

@@ -15,11 +15,15 @@ import {
 import { useGetStudents, useDeleteStudent, type Student } from '@/hooks/students';
 import { toast } from 'sonner';
 import { useGetAllUsers } from '@/hooks/admin';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { formatEnumLabel, parseStudentLevel, formatFullName } from '@/lib/data-parser';
 
 function StudentList() {
     const navigate = useNavigate();
     const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
-    
+    const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; student: Student | null }>({ isOpen: false, student: null });
+    const [bulkDeleteDialog, setBulkDeleteDialog] = useState<{ isOpen: boolean; count: number }>({ isOpen: false, count: 0 });
+
     // Fetch students from API
     const { data: students, isLoading, error, refetch } = useGetAllUsers(1, 50);
     const { mutate: deleteStudent, isPending: isDeleting } = useDeleteStudent();
@@ -107,25 +111,25 @@ function StudentList() {
             key: 'studentLevel',
             label: 'Grade',
             sortable: true,
-            width: '100px',
+            width: '150px',
             render: (student) => (
-                <Badge variant="outline">{student.profile?.studentLevel}</Badge>
+                <Badge variant="outline">{parseStudentLevel(student.studentLevel || student.profile?.studentLevel)}</Badge>
             ),
         },
         {
-            key: 'gender',
-            label: 'Gender',
+            key: 'department',
+            label: 'Department',
             sortable: true,
-            width: '100px',
+            width: '120px',
             render: (student) => (
-                <Badge variant="outline">{student.profile?.gender}</Badge>
+                <Badge variant="outline">{formatEnumLabel(student.department || student.profile?.department)}</Badge>
             ),
         },
         {
             key: 'isVerified',
             label: 'Verification',
             sortable: true,
-            width: '100px',
+            width: '120px',
             render: (student) => (
                 <Badge variant={student.isVerified ? "default" : "outline"}>
                     {student.isVerified ? "Verified" : "Not Verified"}
@@ -159,33 +163,31 @@ function StudentList() {
     // Define filters for ShadcnDataTable
     const filters: ShadcnDataTableFilter[] = [
         {
-            key: 'grade',
+            key: 'studentLevel',
             label: 'Grade',
-            options: [...new Set(studentsData?.map((s: { grade: any; }) => s.grade).filter(Boolean))]
+            options: [...new Set(studentsData?.map((s: any) => s.profile?.studentLevel).filter(Boolean))]
                 .sort()
                 .map(g => ({
                     value: String(g!),
-                    label: `Grade ${g}`,
+                    label: parseStudentLevel(String(g)),
                 })),
         },
         {
-            key: 'section',
-            label: 'Section',
-            options: [...new Set(studentsData.map((s: { section: any; }) => s.section).filter(Boolean))]
+            key: 'department',
+            label: 'Department',
+            options: [...new Set(studentsData.map((s: any) => s.department || s.profile?.department).filter(Boolean))]
                 .sort()
                 .map(c => ({
                     value: String(c!),
-                    label: `Section ${c}`,
+                    label: formatEnumLabel(String(c)),
                 })),
         },
         {
             key: 'status',
             label: 'Status',
-            options: [
-                { value: 'active', label: 'Active' },
-                { value: 'inactive', label: 'Inactive' },
-                { value: 'graduated', label: 'Graduated' },
-            ],
+            options: [...new Set(studentsData.map((s: any) => s.status || s.profile?.status).filter(Boolean))]
+                .sort()
+                .map(status => ({ value: String(status), label: formatEnumLabel(String(status)) })),
         },
     ];
 
@@ -212,10 +214,7 @@ function StudentList() {
             icon: Trash2,
             variant: 'destructive',
             onClick: (selected: string[]) => {
-                // console.log('Deleting students:', selected);
-                if (confirm(`Are you sure you want to delete ${selected.length} students?`)) {
-                    alert(`Deleting ${selected.length} students...`);
-                }
+                setBulkDeleteDialog({ isOpen: true, count: selected.length });
             },
         },
     ];
@@ -237,14 +236,7 @@ function StudentList() {
             icon: Trash2,
             variant: 'destructive',
             onClick: (student) => {
-                if (confirm(`Are you sure you want to delete ${student.firstName || student.profile?.firstName || ''} ${student.lastName || student.profile?.lastName || ''}?`)) {
-                    deleteStudent(student.id, {
-                        onSuccess: () => {
-                            toast.success('Student deleted successfully');
-                            refetch();
-                        },
-                    });
-                }
+                setDeleteDialog({ isOpen: true, student });
             },
         },
     ];
@@ -296,13 +288,52 @@ function StudentList() {
                 bulkActions={bulkActions}
                 actions={actions}
                 pagination
-                pageSize={10}
+                pageSize={5}
+                // pageSizeOptions={[5, 10, 25, 50]}
                 // exportable
                 // onExport={() => {
                 //     // console.log('Exporting all students...');
                 //     alert('Exporting student data...');
                 // }}
                 emptyMessage="No students found. Start by onboarding your first student."
+            />
+
+            {/* Single Delete Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={deleteDialog.isOpen}
+                onClose={() => setDeleteDialog({ isOpen: false, student: null })}
+                onConfirm={() => {
+                    if (deleteDialog.student) {
+                        deleteStudent(deleteDialog.student.id, {
+                            onSuccess: () => {
+                                toast.success('Student deleted successfully');
+                                refetch();
+                                setDeleteDialog({ isOpen: false, student: null });
+                            },
+                        });
+                    }
+                }}
+                title="Delete Student"
+                description={`Are you sure you want to delete ${formatFullName(deleteDialog.student || {})}? This action cannot be undone.`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                variant="destructive"
+            />
+
+            {/* Bulk Delete Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={bulkDeleteDialog.isOpen}
+                onClose={() => setBulkDeleteDialog({ isOpen: false, count: 0 })}
+                onConfirm={() => {
+                    // Handle bulk delete
+                    toast.success(`Deleting ${bulkDeleteDialog.count} students...`);
+                    setBulkDeleteDialog({ isOpen: false, count: 0 });
+                }}
+                title="Delete Multiple Students"
+                description={`Are you sure you want to delete ${bulkDeleteDialog.count} selected students? This action cannot be undone.`}
+                confirmText="Delete All"
+                cancelText="Cancel"
+                variant="destructive"
             />
         </div>
     );

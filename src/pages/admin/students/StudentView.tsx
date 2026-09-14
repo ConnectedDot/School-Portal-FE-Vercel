@@ -26,10 +26,13 @@ import {
     Users,
     Clock
 } from 'lucide-react';
+import { formatEnumLabel, parseStudentLevel } from '@/lib/data-parser';
+import { useGetStudents } from '@/hooks/students';
 
 const StudentView = () => {
     const navigate = useNavigate();
     const { id } = useParams();
+    const { data: availableStudents, isLoading } = useGetStudents();
     // const navigate = useNavigate();
     // Try to get student from location state first
     const [student, setStudent] = useState<Student | null>(() => {
@@ -51,6 +54,23 @@ const StudentView = () => {
         }
         return null;
     });
+
+    useEffect(() => {
+        if (student || !availableStudents || !id) return;
+        const match = availableStudents.find((item: any) => item.id === id || item.userId === id);
+        if (match) {
+            setStudent({
+                ...match,
+                ...match.profile,
+                firstName: match.firstName || match.profile?.firstName || '',
+                lastName: match.lastName || match.profile?.lastName || '',
+                avatar: match.avatar || match.profile?.avatar || '',
+                grade: match.studentLevel || match.profile?.studentLevel || '',
+                class: match.department || match.profile?.department || '',
+                phone: match.phone || match.profile?.phone || '',
+            } as Student);
+        }
+    }, [availableStudents, id, student]);
     // const [loading, setLoading] = useState(true);
 
     // useEffect(() => {
@@ -88,6 +108,15 @@ const StudentView = () => {
     //         </div>
     //     );
     // }
+
+    if (!student && isLoading) {
+        return (
+            <div className="flex min-h-96 flex-col items-center justify-center gap-3" role="status" aria-live="polite">
+                <Loader />
+                <p className="text-sm text-muted-foreground">Loading student profile…</p>
+            </div>
+        );
+    }
 
     if (!student) {
         return (
@@ -144,9 +173,9 @@ const StudentView = () => {
                                 <p className="text-muted-foreground mt-1 flex items-center gap-2">
                                     {/* <Badge variant="secondary">ID: {student.id}</Badge> */}
                                     <span>•</span>
-                                    <Badge variant="outline">Grade {student.grade}</Badge>
+                                    <Badge variant="outline">Grade {parseStudentLevel(student.grade)}</Badge>
                                     <span>•</span>
-                                    <Badge variant="outline">Class {student.class}</Badge>
+                                    <Badge variant="outline">Department {formatEnumLabel(student.class)}</Badge>
                                 </p>
                             </div>
                         </div>

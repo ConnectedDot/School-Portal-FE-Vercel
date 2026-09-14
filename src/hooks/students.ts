@@ -109,10 +109,14 @@ export const useUploadStudentAvatar = () => {
 export const useCreateStudent = (
     onSuccessFn?: (data: any) => Promise<any>
 ) => {
+    const client = useQueryClient();
     return useCreateItem<Student>(
         '/auth/register',
         'Student created successfully',
-        onSuccessFn,
+        async (data) => {
+            await client.invalidateQueries({ queryKey: ['/admin/all-users'] });
+            if (onSuccessFn) await onSuccessFn(data);
+        },
         false, // Not form data
         true,  // Show success alert
         true   // Show error alert
@@ -133,10 +137,14 @@ export const useDeleteStudent = () => {
 export const useBulkUploadStudents = (
     onSuccessFn?: (data: any) => Promise<any>
 ) => {
+    const client = useQueryClient();
     return useCreateItem<any>(
         '/auth/bulk-register',
         'Students uploaded successfully',
-        onSuccessFn,
+        async (data) => {
+            await client.invalidateQueries({ queryKey: ['/admin/all-users'] });
+            if (onSuccessFn) await onSuccessFn(data);
+        },
         true,  // IS form data (file upload)
         true,  // Show success alert
         true   // Show error alert

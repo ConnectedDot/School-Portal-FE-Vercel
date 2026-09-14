@@ -7,10 +7,14 @@ import { AdnPaths } from '../../../router/paths';
 import { Eye, Edit, Trash2, BookOpen, Calendar, Users, Download, Award, Building, Loader2 } from 'lucide-react';
 import { useGetCourses, useDeleteCourse, type Course } from '@/hooks/courses';
 import { toast } from 'sonner';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { formatEnumLabel } from '@/lib/data-parser';
 
 const CourseList = () => {
     const navigate = useNavigate();
     const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
+    const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
+    const [archiveCount, setArchiveCount] = useState(0);
 
     // Fetch courses from API
     const { data: courses = [], isLoading, error, refetch } = useGetCourses(1, 50);
@@ -77,7 +81,7 @@ const CourseList = () => {
             width: '150px',
             render: (course) => (
                 <Badge variant="outline">
-                    {course.subject || 'N/A'}
+                    {formatEnumLabel(course.subject, 'Not specified')}
                 </Badge>
             ),
         },
@@ -88,7 +92,7 @@ const CourseList = () => {
             width: '120px',
             render: (course) => (
                 <Badge variant="secondary">
-                    {course.courseType || 'N/A'}
+                    {formatEnumLabel(course.courseType, 'Not specified')}
                 </Badge>
             ),
         },
@@ -110,7 +114,7 @@ const CourseList = () => {
             render: (course) => (
                 <Badge variant="outline" className="gap-1">
                     <Users className="h-3 w-3" />
-                    {course.enrollmentCount || 0}
+                    {Array.isArray(course.enrollments) ? course.enrollments.length : (course.enrollmentCount ?? 0)}
                 </Badge>
             ),
         },
@@ -131,10 +135,7 @@ const CourseList = () => {
             icon: Trash2,
             variant: 'destructive',
             onClick: (selected: string[]) => {
-                if (confirm(`Are you sure you want to archive ${selected.length} courses?`)) {
-                    // console.log('Archiving courses:', selected);
-                    toast.success(`Archiving ${selected.length} courses...`);
-                }
+                setArchiveCount(selected.length);
             },
         },
     ];
@@ -155,16 +156,7 @@ const CourseList = () => {
             label: 'Delete',
             icon: Trash2,
             variant: 'destructive',
-            onClick: (course) => {
-                if (confirm(`Are you sure you want to delete ${course.title}?`)) {
-                    deleteCourse(course.id, {
-                        onSuccess: () => {
-                            refetch();
-                            toast.success('Course deleted successfully');
-                        },
-                    });
-                }
-            },
+            onClick: setCourseToDelete,
         },
     ];
 
@@ -192,7 +184,7 @@ const CourseList = () => {
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Active Courses</p>
                                 <p className="text-2xl font-bold mt-1">
-                                    {courseList.filter(c => c.status === 'Active').length}
+                                    {courseList.some(c => c.status) ? courseList.filter(c => c.status === 'ACTIVE').length : '—'}
                                 </p>
                             </div>
                             <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -208,7 +200,7 @@ const CourseList = () => {
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Departments</p>
                                 <p className="text-2xl font-bold mt-1">
-                                    {new Set(courseList.map(c => c.department)).size}
+                                    {new Set(courseList.flatMap(c => c.allowedDepartments || []).filter(department => department && department !== 'NONE')).size}
                                 </p>
                             </div>
                             <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -224,7 +216,7 @@ const CourseList = () => {
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground">Instructors</p>
                                 <p className="text-2xl font-bold mt-1">
-                                    {new Set(courseList.map(c => c.teacherId)).size}
+                                    {new Set(courseList.map(c => c.teacherId).filter(Boolean)).size}
                                 </p>
                             </div>
                             <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -252,7 +244,8 @@ const CourseList = () => {
                 bulkActions={bulkActions}
                 actions={actions}
                 pagination
-                pageSize={10}
+                pageSize={5}
+                pageSizeOptions={[5, 10, 25, 50]}
                 exportable
                 onExport={() => {
                     toast.success('Exporting course data...');
@@ -262,6 +255,38 @@ const CourseList = () => {
                     onClick: () => navigate(`${AdnPaths.COURSES}/create`),
                 }}
                 emptyMessage="No courses found. Start by creating your first course."
+            />
+            <ConfirmDialog
+                isOpen={!!courseToDelete}
+                onClose={() => setCourseToDelete(null)}
+                onConfirm={() => {
+                    if (!courseToDelete) return;
+                    deleteCourse(courseToDelete.id, {
+                        onSuccess: () => {
+                            setCourseToDelete(null);
+                            refetch();
+                            toast.success('Course deleted successfully');
+                        },
+                    });
+                }}
+                title="Delete course?"
+                description={`You are about to permanently delete “${courseToDelete?.title || 'this course'}”. Its associations may no longer be available to teachers and students. This action cannot be undone.`}
+                confirmText="Proceed with deletion"
+                cancelText="Keep course"
+                variant="destructive"
+            />
+            <ConfirmDialog
+                isOpen={archiveCount > 0}
+                onClose={() => setArchiveCount(0)}
+                onConfirm={() => {
+                    toast.info('Course archiving is not available in the current API. No courses were changed.');
+                    setArchiveCount(0);
+                }}
+                title="Archive selected courses?"
+                description={`${archiveCount} courses are selected. The current API does not provide an archive operation, so this confirmation will not alter records.`}
+                confirmText="Acknowledge"
+                cancelText="Cancel"
+                variant="destructive"
             />
         </div>
     );

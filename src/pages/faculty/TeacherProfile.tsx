@@ -179,7 +179,7 @@ const TeacherProfile = () => {
                                         }
                                         className="px-3 py-1 text-sm rounded-full capitalize"
                                     >
-                                        {profile.status.toLowerCase()}
+                                        {(profile.status || 'PENDING').toLowerCase()}
                                     </Badge>
                                 </div>
                                 {profile.department && (

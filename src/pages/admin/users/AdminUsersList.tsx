@@ -9,8 +9,12 @@ import { useGetAllUsers, type User } from '@/hooks/admin';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShadcnDataTable, type ShadcnDataTableColumn, type ShadcnDataTableAction } from '@/components/common/ShadcnDataTable';
 import { getRoleBadgeVariant, getStatusBadgeVariant } from '@/helpers';
+import { useNavigate } from 'react-router-dom';
+import { AdnPaths } from '@/router/paths';
+import { formatEnumLabel } from '@/lib/data-parser';
 
 const AdminUsersList = () => {
+    const navigate = useNavigate();
     const [roleFilter, setRoleFilter] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [debouncedSearch, setDebouncedSearch] = useState<string>('');
@@ -92,10 +96,10 @@ const AdminUsersList = () => {
             label: 'Contact',
             render: (user) => (
                 <div className="space-y-1 text-sm">
-                    {user.phoneNumber && (
+                    {(user.phone || user.phoneNumber) && (
                         <div className="flex items-center gap-1 text-muted-foreground">
                             <Phone className="h-3 w-3" />
-                            {user.phoneNumber}
+                            {user.phone || user.phoneNumber}
                         </div>
                     )}
                 </div>
@@ -127,8 +131,9 @@ const AdminUsersList = () => {
         {
             label: 'View Profile',
             onClick: (user) => {
-                console.log('View profile:', user);
-                // Navigate to user profile
+                if (user.role === 'STUDENT') navigate(`${AdnPaths.ROOT}/students/${user.id}`, { state: { student: user } });
+                else if (user.role === 'TEACHER') navigate(`${AdnPaths.ROOT}/faculty/${user.id}`);
+                else navigate(AdnPaths.SETTINGS);
             },
         },
         {
@@ -218,13 +223,38 @@ const AdminUsersList = () => {
                 searchable
                 searchKeys={['firstName', 'lastName', 'email', 'role', 'department']}
                 searchPlaceholder="Search users by name, email, role, department..."
+                filterable
+                filters={[
+                    {
+                        key: 'role',
+                        label: 'Role',
+                        options: [...new Set(UserList.map(user => user.role).filter(Boolean))]
+                            .sort()
+                            .map(role => ({ value: role, label: formatEnumLabel(role) })),
+                    },
+                    {
+                        key: 'department',
+                        label: 'Department',
+                        options: [...new Set(UserList.map(user => user.department).filter(Boolean) as string[])]
+                            .sort()
+                            .map(department => ({ value: department, label: formatEnumLabel(department) })),
+                    },
+                    {
+                        key: 'status',
+                        label: 'Status',
+                        options: [...new Set(UserList.map(user => user.status).filter(Boolean) as string[])]
+                            .sort()
+                            .map(status => ({ value: status, label: formatEnumLabel(status) })),
+                    },
+                ]}
                 selectable
                 selectedItems={[]}
                 onSelectionChange={() => {}}
                 bulkActions={[]}
                 actions={actions}
                 pagination
-                pageSize={10}
+                pageSize={5}
+                // pageSizeOptions={[5, 10, 25, 50]}
                 exportable
                 onExport={() => {
                     // Implement export logic here

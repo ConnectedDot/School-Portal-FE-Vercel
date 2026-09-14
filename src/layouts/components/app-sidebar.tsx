@@ -43,7 +43,7 @@ const getNavigationByRole = (role?: string) => {
 			return [
 				{ title: "Dashboard", url: AdnPaths.DASH, icon: LayoutDashboard },
 				{
-					title: "People Management",
+					title: "Management",
 					url: "#",
 					icon: Users,
 					items: [
@@ -53,7 +53,7 @@ const getNavigationByRole = (role?: string) => {
 					],
 				},
 				{
-					title: "Academic Setup",
+					title: "Academics",
 					url: "#",
 					icon: BookOpenCheck,
 					items: [

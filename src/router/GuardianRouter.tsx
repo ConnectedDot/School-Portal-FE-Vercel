@@ -10,6 +10,7 @@ const GuardianCommunication = lazy(() => import('../pages/guardian/GuardianCommu
 const GuardianCalendar = lazy(() => import('../pages/guardian/GuardianCalendar'));
 const GuardianPayments = lazy(() => import('../pages/guardian/GuardianPayments'));
 const NotFound = lazy(() => import('../pages/errors/NotFound'));
+const AccountProfile = lazy(() => import('../pages/account/AccountProfile'));
 
 export const GuardianRouter = () => {
     return (
@@ -23,6 +24,7 @@ export const GuardianRouter = () => {
             <Route path="communication" element={<GuardianCommunication />} />
             <Route path="calendar" element={<GuardianCalendar />} />
             <Route path="payments" element={<GuardianPayments />} />
+            <Route path="profile" element={<AccountProfile />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
     );

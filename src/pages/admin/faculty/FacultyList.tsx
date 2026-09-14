@@ -8,10 +8,14 @@ import { Eye, Edit, Trash2, Mail, Download, Loader2 } from 'lucide-react';
 import { useGetTeachers, useDeleteTeacher } from '@/hooks/teachers';
 import { toast } from 'sonner';
 import type { TeacherData } from '@/types/teachers';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { formatEnumLabel, formatFullName } from '@/lib/data-parser';
 
 const FacultyList = () => {
     const navigate = useNavigate();
     const [selectedFaculty, setSelectedFaculty] = useState<string[]>([]);
+    const [deleteDialog, setDeleteDialog] = useState<TeacherData | null>(null);
+    const [bulkDeleteCount, setBulkDeleteCount] = useState(0);
     
     // Fetch teachers from API
     const { data: teachers, isLoading, error, refetch } = useGetTeachers(1, 50, true);
@@ -138,11 +142,9 @@ const FacultyList = () => {
         {
             key: 'status',
             label: 'Status',
-            options: [
-                { value: 'active', label: 'Active' },
-                { value: 'inactive', label: 'Inactive' },
-                { value: 'on-leave', label: 'On Leave' },
-            ],
+            options: [...new Set(facultyList.map((t: TeacherData) => String(t.status || '')).filter(Boolean))]
+                .sort()
+                .map(status => ({ value: status, label: formatEnumLabel(status) })),
         },
     ];
 
@@ -169,9 +171,7 @@ const FacultyList = () => {
             icon: Trash2,
             variant: 'destructive',
             onClick: (selected: string[]) => {
-                if (confirm(`Are you sure you want to delete ${selected.length} faculty members?`)) {
-                    toast.success(`Deleting ${selected.length} faculty members...`);
-                }
+                setBulkDeleteCount(selected.length);
             },
         },
     ];
@@ -181,7 +181,7 @@ const FacultyList = () => {
         {
             label: 'View',
             icon: Eye,
-            onClick: (teacher) => toast.info('View details coming soon'),
+            onClick: (teacher) => navigate(`${AdnPaths.FACULTY}/${teacher?.id || ''}`),
         },
         {
             label: 'Edit',
@@ -192,16 +192,7 @@ const FacultyList = () => {
             label: 'Delete',
             icon: Trash2,
             variant: 'destructive',
-            onClick: (teacher) => {
-                if (confirm(`Are you sure you want to delete ${teacher.firstName} ${teacher.lastName}?`)) {
-                    deleteTeacher(teacher.id, {
-                        onSuccess: () => {
-                            toast.success('Faculty member deleted successfully');
-                            refetch();
-                        },
-                    });
-                }
-            },
+            onClick: setDeleteDialog,
         },
     ];
 
@@ -225,7 +216,8 @@ const FacultyList = () => {
                 bulkActions={bulkActions}
                 actions={actions}
                 pagination
-                pageSize={10}
+                pageSize={5}
+                // pageSizeOptions={[5, 10, 25, 50]}
                 exportable
                 onExport={() => {
                     // console.log('Exporting all faculty...');
@@ -236,6 +228,38 @@ const FacultyList = () => {
                     onClick: () => navigate(AdnPaths.FACULTY_CREATE),
                 }}
                 emptyMessage="No faculty members found. Start by adding your first teacher."
+            />
+            <ConfirmDialog
+                isOpen={!!deleteDialog}
+                onClose={() => setDeleteDialog(null)}
+                onConfirm={() => {
+                    if (!deleteDialog?.id) return;
+                    deleteTeacher(deleteDialog.id, {
+                        onSuccess: () => {
+                            toast.success('Faculty member deleted successfully');
+                            setDeleteDialog(null);
+                            refetch();
+                        },
+                    });
+                }}
+                title="Delete faculty member?"
+                description={`You are about to permanently remove ${formatFullName(deleteDialog || {})} and their portal access. This action cannot be undone.`}
+                confirmText={isDeleting ? 'Deleting…' : 'Proceed with deletion'}
+                cancelText="Keep faculty member"
+                variant="destructive"
+            />
+            <ConfirmDialog
+                isOpen={bulkDeleteCount > 0}
+                onClose={() => setBulkDeleteCount(0)}
+                onConfirm={() => {
+                    toast.info('Bulk deletion requires a supported API endpoint. No records were removed.');
+                    setBulkDeleteCount(0);
+                }}
+                title="Delete selected faculty?"
+                description={`This would permanently remove ${bulkDeleteCount} faculty records. The current API does not expose a safe bulk-delete operation, so no deletion will be attempted.`}
+                confirmText="Acknowledge"
+                cancelText="Cancel"
+                variant="destructive"
             />
         </div>
     );

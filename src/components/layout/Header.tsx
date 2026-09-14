@@ -1,7 +1,6 @@
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-	Bell,
 	Command,
 	LogOut,
 	Menu,
@@ -29,10 +28,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-	Tooltip,
-	TooltipContent,
 	TooltipProvider,
-	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { NotificationBell } from "./NotificationBell";
 
@@ -44,6 +40,14 @@ export const Header = () => {
 	const handleLogout = () => {
 		logout();
 		navigate("/login", { replace: true });
+	};
+
+	const openProfile = () => {
+		const role = user?.role?.toUpperCase();
+		if (role === 'STUDENT') navigate('/sdt/profile');
+		else if (role === 'TEACHER') navigate('/fcy/profile');
+		else if (role === 'ADMINISTRATOR') navigate('/adn/profile');
+		else navigate('/gdn/profile');
 	};
 
 	const getInitials = () => {
@@ -113,16 +117,6 @@ export const Header = () => {
 
 						<NotificationBell />
 
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full border border-slate-200 bg-white/80 hover:bg-brand-50 hover:text-brand-700 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10">
-									<Bell className="h-4 w-4" />
-									<span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-brand-500 ring-2 ring-white dark:ring-[#050505]" />
-								</Button>
-							</TooltipTrigger>
-							<TooltipContent>System alerts</TooltipContent>
-						</Tooltip>
-
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<Button variant="ghost" className="h-11 gap-2 rounded-full border border-slate-200 bg-white/80 px-2 pr-3 hover:bg-brand-50 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10">
@@ -157,7 +151,7 @@ export const Header = () => {
 									</div>
 								</DropdownMenuLabel>
 								<DropdownMenuSeparator />
-								<DropdownMenuItem>
+								<DropdownMenuItem onClick={openProfile}>
 									<User className="mr-2 h-4 w-4" /> Profile
 								</DropdownMenuItem>
 								<DropdownMenuItem>

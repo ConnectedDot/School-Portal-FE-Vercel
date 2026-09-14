@@ -9,6 +9,7 @@ import { Award, Plus, Edit, Trash2, Loader2, Calendar, Building, ExternalLink } 
 import { useGetTeacherProfile, useCreateCertification, useUpdateCertification, useDeleteCertification, type Certification } from '@/hooks/teachers';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
 const Certifications = () => {
     const { data: profile, isLoading, refetch } = useGetTeacherProfile();
@@ -22,6 +23,7 @@ const Certifications = () => {
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [selectedCert, setSelectedCert] = useState<Certification | null>(null);
+    const [certToDelete, setCertToDelete] = useState<Certification | null>(null);
     const [formData, setFormData] = useState({
         name: '',
         issuingOrganization: '',
@@ -63,16 +65,9 @@ const Certifications = () => {
         setIsEditDialogOpen(true);
     };
 
-    const handleDelete = (certId: string) => {
-        if (confirm('Are you sure you want to delete this certification?')) {
-            deleteCert(certId, {
-                onSuccess: () => {
-                    refetch();
-                    toast.success('Certification deleted successfully');
-                },
-            });
-        }
-    };
+    const handleDelete = (certId: string) => setCertToDelete(
+        certifications.find((cert: Certification) => cert.id === certId) || null
+    );
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -339,6 +334,25 @@ const Certifications = () => {
                     </form>
                 </DialogContent>
             </Dialog>
+            <ConfirmDialog
+                isOpen={!!certToDelete}
+                onClose={() => setCertToDelete(null)}
+                onConfirm={() => {
+                    if (!certToDelete) return;
+                    deleteCert(certToDelete.id, {
+                        onSuccess: () => {
+                            setCertToDelete(null);
+                            refetch();
+                            toast.success('Certification deleted successfully');
+                        },
+                    });
+                }}
+                title="Delete certification?"
+                description={`You are about to permanently delete “${certToDelete?.name || 'this certification'}”. This action cannot be undone.`}
+                confirmText="Proceed with deletion"
+                cancelText="Keep certification"
+                variant="destructive"
+            />
         </div>
     );
 };

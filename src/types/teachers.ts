@@ -22,13 +22,33 @@ export interface TeacherData {
     ID?: string;
     firstName: string;
     lastName: string;
-    email: string; // must be an email
-    password?: string;
+    email?: string; // must be an email
+    userId?: string;
+    schoolId?: string;
+    avatar?: string | null;
     dateOfBirth: string;
     gender: 'MALE' | 'FEMALE' | 'OTHER';
     qualification: string;
     phone: string; // must be a string, should not be empty
     employmentType: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERN'; // should not be empty
+    yearsOfExperience?: any;
+    address?: string | null;
+    stateOfOrigin?: string | null;
+    nationality?: string | null;
+    salary?: any;
+    bankName?: string | null;
+    accountNumber?: string | null;
+    emergencyContactName?: string | null;
+    emergencyContactPhone?: string | null;
+    emergencyContactRelation?: string | null;
+    status?: string;
+    startAcademicYearId?: string;
+    currentAcademicYearId?: string;
+    startAcademicYear?: { id: string; name: string; startYear: number; endYear: number };
+    currentAcademicYear?: { id: string; name: string; startYear: number; endYear: number };
+    user?: { id: string; email: string; role: string; isVerified: boolean; createdAt?: string; updatedAt?: string };
+    certifications?: any[];
+    coursesTaught?: any[];
 }
 
 

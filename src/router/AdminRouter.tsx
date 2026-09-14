@@ -26,6 +26,7 @@ const Communication = lazy(() => import('../pages/admin/Communication'));
 const Calendar = lazy(() => import('../pages/admin/Calendar'));
 const Reports = lazy(() => import('../pages/admin/Reports'));
 const Settings = lazy(() => import('../pages/admin/Settings'));
+const AccountProfile = lazy(() => import('../pages/account/AccountProfile'));
 const NotFound = lazy(() => import('../pages/errors/NotFound'));
 
 export const AdminRouter = () => {
@@ -68,6 +69,7 @@ export const AdminRouter = () => {
             {/* Reports & Settings */}
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="profile" element={<AccountProfile />} />
 
             {/* Fallback - 404 Not Found */}
             <Route path="*" element={<NotFound />} />

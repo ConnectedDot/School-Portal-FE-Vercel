@@ -48,6 +48,7 @@ export const AdnPaths = {
     NOTIFICATIONS: '/adn/notifications',
     REPORTS: '/adn/reports',
     SETTINGS: '/adn/settings',
+    PROFILE: '/adn/profile',
     COMMUNICATION: '/adn/communication',
     CALENDAR: '/adn/calendar',
 } as const;
@@ -99,6 +100,7 @@ export const GdnPaths = {
     COMMUNICATION: '/gdn/communication',
     CALENDAR: '/gdn/calendar',
     PAYMENTS: '/gdn/payments',
+    PROFILE: '/gdn/profile',
 } as const;
 
 // Helper functions to generate dynamic paths
