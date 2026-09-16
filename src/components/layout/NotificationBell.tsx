@@ -43,7 +43,7 @@ export const NotificationBell = () => {
     const { mutate: deleteNotification } = useDeleteNotification();
 
     const [isOpen, setIsOpen] = useState(false);
-    const unreadCount = unreadData?.unreadCount || 0;
+    const unreadCount = unreadData?.unreadCount ?? unreadData?.count ?? 0;
 
     const getNotificationIcon = (type: string) => {
         switch (type) {

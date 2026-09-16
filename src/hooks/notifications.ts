@@ -21,8 +21,15 @@ export interface CreateNotificationDto {
     metadata?: Record<string, any>;
 }
 
+export interface AdminSendNotificationDto extends CreateNotificationDto {
+    sendToAll?: boolean;
+    recipientRole?: string;
+    recipientIds?: string[];
+}
+
 export interface NotificationStats {
-    unreadCount: number;
+    count?: number;
+    unreadCount?: number;
 }
 
 // Get my notifications (with pagination)
@@ -52,6 +59,19 @@ export const useCreateNotification = (
 ) => {
     return useCreateItem<Notification>(
         '/notification/create-notification',
+        'Notification sent successfully',
+        onSuccessFn,
+        false,
+        true,
+        true
+    );
+};
+
+export const useSendAdminNotification = (
+    onSuccessFn?: (data: any) => Promise<any>
+) => {
+    return useCreateItem<any>(
+        '/notification/admin/send',
         'Notification sent successfully',
         onSuccessFn,
         false,

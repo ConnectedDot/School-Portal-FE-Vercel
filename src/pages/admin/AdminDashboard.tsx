@@ -53,7 +53,7 @@ export const AdminDashboard = () => {
         // Count active vs pending students
         const activeStudents = students.filter((s: any) => s.status === 'ACTIVE').length;
         const pendingStudents = students.filter((s: any) => s.status === 'PENDING').length;
-        
+
         return {
             totalStudents: students.length,
             activeStudents,
@@ -182,130 +182,99 @@ export const AdminDashboard = () => {
     }
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold text-foreground">
-                        Welcome back, {user?.firstName || 'Admin'} 👋
-                    </h1>
-                    <p className="text-muted-foreground mt-1">
-                        Your current school summary and activity.
-                    </p>
-                </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => navigate(AdnPaths.REPORTS)}>
-                        <IonIcon icon={statsChartOutline} className="mr-2" />
-                        Export report
-                    </Button>
-                    <Button onClick={() => navigate(AdnPaths.STUDENTS_ONBOARD)}>
-                        <IonIcon icon={addCircleOutline} className="mr-2" />
-                        Add Student
-                    </Button>
-                </div>
-            </div>
-
-            {/* Main Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {overviewStats.map((stat, index) => (
-                    <Card 
-                        key={index} 
-                        className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all"
-                        onClick={stat.onClick}
-                    >
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                {stat.title}
-                            </CardTitle>
-                            <div className={`${stat.lightColor} p-2 rounded-lg`}>
-                                <IonIcon 
-                                    icon={stat.icon} 
-                                    className={`w-5 h-5 ${stat.textColor}`}
-                                />
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-3xl font-bold text-foreground">
-                                {stat.value}
-                            </div>
-                            <div className="flex items-center gap-2 mt-2">
-                                <Badge 
-                                    variant={stat.trend === 'up' ? 'success' : 'error'}
-                                    className="text-xs"
-                                >
-                                    <IonIcon 
-                                        icon={stat.trend === 'up' ? trendingUpOutline : trendingDownOutline} 
-                                        className="w-3 h-3 mr-1"
-                                    />
-                                    {stat.change}
-                                </Badge>
-                                <span className="text-xs text-muted-foreground">
-                                    {stat.description}
-                                </span>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-
-            {/* System Overview */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <IonIcon icon={statsChartOutline} className="w-5 h-5" />
-                        System Overview
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {systemOverview.map((item, index) => (
-                            <div key={index} className="flex items-center gap-3 rounded-2xl bg-muted/45 p-4 ring-1 ring-inset ring-border/30">
-                                <div className={`${item.color}`}>
-                                    <IonIcon icon={item.icon} className="w-6 h-6" />
-                                </div>
-                                <div>
-                                    <div className="text-2xl font-bold">{item.value}</div>
-                                    <div className="text-xs text-muted-foreground">{item.label}</div>
-                                </div>
-                            </div>
-                        ))}
+        <>
+            <div className="space-y-6">
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold text-foreground">
+                            Welcome back, {user?.firstName || 'Admin'} 👋
+                        </h1>
+                        <p className="text-muted-foreground mt-1">
+                            Your current school summary and activity.
+                        </p>
                     </div>
-                </CardContent>
-            </Card>
+                    <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => navigate(AdnPaths.REPORTS)}>
+                            <IonIcon icon={statsChartOutline} className="mr-2" />
+                            Export report
+                        </Button>
+                        <Button onClick={() => navigate(AdnPaths.STUDENTS_ONBOARD)}>
+                            <IonIcon icon={addCircleOutline} className="mr-2" />
+                            Add Student
+                        </Button>
+                    </div>
+                </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Quick Actions */}
-                <Card className="lg:col-span-1">
+                {/* Main Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {overviewStats.map((stat, index) => (
+                        <Card
+                            key={index}
+                            className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all"
+                            onClick={stat.onClick}
+                        >
+                            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                <CardTitle className="text-sm font-medium text-muted-foreground">
+                                    {stat.title}
+                                </CardTitle>
+                                <div className={`${stat.lightColor} p-2 rounded-lg`}>
+                                    <IonIcon
+                                        icon={stat.icon}
+                                        className={`w-5 h-5 ${stat.textColor}`}
+                                    />
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-3xl font-bold text-foreground">
+                                    {stat.value}
+                                </div>
+                                <div className="flex items-center gap-2 mt-2">
+                                    <Badge
+                                        variant={stat.trend === 'up' ? 'success' : 'error'}
+                                        className="text-xs"
+                                    >
+                                        <IonIcon
+                                            icon={stat.trend === 'up' ? trendingUpOutline : trendingDownOutline}
+                                            className="w-3 h-3 mr-1"
+                                        />
+                                        {stat.change}
+                                    </Badge>
+                                    <span className="text-xs text-muted-foreground">
+                                        {stat.description}
+                                    </span>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+
+                {/* System Overview */}
+                <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <IonIcon icon={addCircleOutline} className="w-5 h-5" />
-                            Quick Actions
+                            <IonIcon icon={statsChartOutline} className="w-5 h-5" />
+                            System Overview
                         </CardTitle>
-                        <CardDescription>Frequently used features</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-2">
-                        {quickActions.map((action, index) => (
-                            <Button
-                                key={index}
-                                variant="outline"
-                                className="w-full justify-start h-auto p-3 hover:bg-accent"
-                                onClick={() => navigate(action.path)}
-                            >
-                                <div className={`${action.color} p-2 rounded-lg mr-3`}>
-                                    <IonIcon icon={action.icon} className="w-4 h-4 text-white" />
+                    <CardContent>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {systemOverview.map((item, index) => (
+                                <div key={index} className="flex items-center gap-3 rounded-2xl bg-muted/45 p-4 ring-1 ring-inset ring-border/30">
+                                    <div className={`${item.color}`}>
+                                        <IonIcon icon={item.icon} className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <div className="text-2xl font-bold">{item.value}</div>
+                                        <div className="text-xs text-muted-foreground">{item.label}</div>
+                                    </div>
                                 </div>
-                                <div className="text-left flex-1">
-                                    <div className="font-medium text-sm">{action.title}</div>
-                                    <div className="text-xs text-muted-foreground">{action.description}</div>
-                                </div>
-                                <IonIcon icon={arrowForwardOutline} className="w-4 h-4 text-muted-foreground" />
-                            </Button>
-                        ))}
+                            ))}
+                        </div>
                     </CardContent>
                 </Card>
 
-                {/* Recent Registrations */}
-                <Card className="lg:col-span-2">
+                {/* <Card className="lg:col-span-2">
                     <CardHeader>
                         <div className="flex items-center justify-between">
                             <div>
@@ -325,8 +294,8 @@ export const AdminDashboard = () => {
                         <div className="space-y-3">
                             {stats.recentStudents.length > 0 ? (
                                 stats.recentStudents.map((student: any) => (
-                                    <div 
-                                        key={student.id} 
+                                    <div
+                                        key={student.id}
                                         className="flex items-center justify-between rounded-2xl bg-muted/35 p-3 ring-1 ring-inset ring-border/25 hover:bg-muted/65 transition-colors cursor-pointer"
                                         onClick={() => navigate(AdnPaths.STUDENTS_VIEW.replace(':id', student.id))}
                                     >
@@ -365,63 +334,43 @@ export const AdminDashboard = () => {
                             )}
                         </div>
                     </CardContent>
-                </Card>
+                </Card> */}
             </div>
 
-            {/* Recent Activity & Upcoming Events */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Recent Teachers */}
-                <Card>
+               
+                {/* Quick Actions */}
+                <Card className="max-w-md">
                     <CardHeader>
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <CardTitle className="flex items-center gap-2">
-                                    <IonIcon icon={peopleOutline} className="w-5 h-5" />
-                                    Faculty Overview
-                                </CardTitle>
-                                <CardDescription>Recently added teachers</CardDescription>
-                            </div>
-                            <Button variant="ghost" size="sm" onClick={() => navigate(AdnPaths.FACULTY)}>
-                                View all
-                                <IonIcon icon={arrowForwardOutline} className="ml-2 w-4 h-4" />
-                            </Button>
-                        </div>
+                        <CardTitle className="flex items-center gap-2">
+                            <IonIcon icon={addCircleOutline} className="w-5 h-5" />
+                            Quick Actions
+                        </CardTitle>
+                        <CardDescription>Frequently used features</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            {stats.recentTeachers.length > 0 ? (
-                                stats.recentTeachers.map((teacher: any) => (
-                                    <div key={teacher.id} className="flex items-center gap-3 rounded-2xl bg-muted/35 p-3 ring-1 ring-inset ring-border/25 hover:bg-muted/65 transition-colors">
-                                        <Avatar className="h-12 w-12">
-                                            <AvatarImage src={teacher.profilePicture} />
-                                            <AvatarFallback className="bg-purple-500 text-white">
-                                                {teacher.firstName?.[0]}{teacher.lastName?.[0]}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <div className="flex-1">
-                                            <div className="font-medium">
-                                                {teacher.firstName} {teacher.lastName}
-                                            </div>
-                                            <div className="text-xs text-muted-foreground">
-                                                {teacher.qualification || 'Teacher'} • {teacher.department || 'General'}
-                                            </div>
-                                        </div>
-                                        <Badge variant="secondary" className="text-xs">
-                                            {teacher.status || 'ACTIVE'}
-                                        </Badge>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="text-center py-8 text-muted-foreground">
-                                    No recent faculty additions
+                    <CardContent className="space-y-2">
+                        {quickActions.map((action, index) => (
+                            <Button
+                                key={index}
+                                variant="outline"
+                                className="w-full justify-start h-auto p-3 hover:bg-accent"
+                                onClick={() => navigate(action.path)}
+                            >
+                                <div className={`${action.color} p-2 rounded-lg mr-3`}>
+                                    <IonIcon icon={action.icon} className="w-4 h-4 text-white" />
                                 </div>
-                            )}
-                        </div>
+                                <div className="text-left flex-1">
+                                    <div className="font-medium text-sm">{action.title}</div>
+                                    <div className="text-xs text-muted-foreground">{action.description}</div>
+                                </div>
+                                <IonIcon icon={arrowForwardOutline} className="w-4 h-4 text-muted-foreground" />
+                            </Button>
+                        ))}
                     </CardContent>
                 </Card>
 
                 {/* Upcoming Events */}
-                <Card>
+                <Card className="max-w-md">
                     <CardHeader>
                         <div className="flex items-center justify-between">
                             <div>
@@ -469,8 +418,59 @@ export const AdminDashboard = () => {
                         </div>
                     </CardContent>
                 </Card>
-            </div>
-        </div>
+
+                {/* COMMENTED OUT: Faculty Overview section - as per requirements */}
+                {/* <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="flex items-center gap-2">
+                                    <IonIcon icon={peopleOutline} className="w-5 h-5" />
+                                    Faculty Overview
+                                </CardTitle>
+                                <CardDescription>Recently added teachers</CardDescription>
+                            </div>
+                            <Button variant="ghost" size="sm" onClick={() => navigate(AdnPaths.FACULTY)}>
+                                View all
+                                <IonIcon icon={arrowForwardOutline} className="ml-2 w-4 h-4" />
+                            </Button>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            {stats.recentTeachers.length > 0 ? (
+                                stats.recentTeachers.map((teacher: any) => (
+                                    <div key={teacher.id} className="flex items-center gap-3 rounded-2xl bg-muted/35 p-3 ring-1 ring-inset ring-border/25 hover:bg-muted/65 transition-colors">
+                                        <Avatar className="h-12 w-12">
+                                            <AvatarImage src={teacher.profilePicture} />
+                                            <AvatarFallback className="bg-purple-500 text-white">
+                                                {teacher.firstName?.[0]}{teacher.lastName?.[0]}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex-1">
+                                            <div className="font-medium">
+                                                {teacher.firstName} {teacher.lastName}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">
+                                                {teacher.qualification || 'Teacher'} • {teacher.department || 'General'}
+                                            </div>
+                                        </div>
+                                        <Badge variant="secondary" className="text-xs">
+                                            {teacher.status || 'ACTIVE'}
+                                        </Badge>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-8 text-muted-foreground">
+                                    No recent faculty additions
+                                </div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card> */}
+
+            </div >
+        </>
     );
 };
 

@@ -30,7 +30,7 @@ import {
 import {
 	TooltipProvider,
 } from "@/components/ui/tooltip";
-import { NotificationBell } from "./NotificationBell";
+import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 
 export const Header = () => {
 	const { user, logout } = useContext(AuthContext);
@@ -115,7 +115,7 @@ export const Header = () => {
 							</DropdownMenuContent>
 						</DropdownMenu>
 
-						<NotificationBell />
+						<NotificationCenter />
 
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>

@@ -17,7 +17,7 @@ import {
     checkmarkCircleOutline,
     closeCircleOutline,
 } from 'ionicons/icons';
-import { useCreateNotification, useSendTestNotification } from '@/hooks/notifications';
+import { useSendAdminNotification, useSendTestNotification } from '@/hooks/notifications';
 import { useGetStudents } from '@/hooks/students';
 import { useGetTeachers } from '@/hooks/teachers';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -44,7 +44,7 @@ const AdminNotifications = () => {
             ? (students as any).data.filter((u: any) => u.role?.toLowerCase() === 'student')
             : [];
 
-    const { mutate: createNotification, isPending: sendingNotification } = useCreateNotification(
+    const { mutate: sendAdminNotification, isPending: sendingNotification } = useSendAdminNotification(
         async () => {
             setFormData({
                 title: '',
@@ -72,7 +72,7 @@ const AdminNotifications = () => {
         const payload: any = {
             title: formData.title,
             message: formData.message,
-            type: formData.type,
+            type: formData.type === 'ANNOUNCEMENT' ? 'INFO' : formData.type,
         };
 
         if (notificationType === 'broadcast') {
@@ -83,7 +83,7 @@ const AdminNotifications = () => {
                 return;
             }
             payload.recipientRole = formData.recipientRole;
-        } else if (notificationType === 'specific') {
+        } else {
             if (formData.recipientIds.length === 0) {
                 toast.error('Please select at least one recipient');
                 return;
@@ -91,7 +91,7 @@ const AdminNotifications = () => {
             payload.recipientIds = formData.recipientIds;
         }
 
-        createNotification(payload);
+        sendAdminNotification(payload);
     };
 
     const handleTestNotification = () => {

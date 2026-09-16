@@ -533,7 +533,7 @@ export function StudentOnboardingForm({ studentId, onSubmit, onCancel, className
                                                         <SelectContent>
                                                             <SelectItem value="NONE">None / Junior School</SelectItem>
                                                             <SelectItem value="SCIENCE">Science</SelectItem>
-                                                            <SelectItem value="ART">Art</SelectItem>
+                                                            <SelectItem value="ATRS">Arts</SelectItem>
                                                             <SelectItem value="COMMERCIAL">Commercial</SelectItem>
                                                         </SelectContent>
                                                     </Select>

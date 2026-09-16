@@ -298,7 +298,11 @@ export const useGetItems = <T>(relativeUrl: string, params?: Record<string, stri
                 });
             }
             const response = await axiosInstance.get<T[]>(url.toString());
-            return response.data;
+            const payload: any = response.data;
+            if (Array.isArray(payload)) return payload;
+            if (Array.isArray(payload?.data)) return payload.data;
+            if (Array.isArray(payload?.data?.data)) return payload.data.data;
+            return [];
         },
         queryKey: [relativeUrl, params],
     });
